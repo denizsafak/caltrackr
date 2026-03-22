@@ -11,7 +11,20 @@
 
 *Plan your week. Track your meals. Cook what you already have.*
 
+
+### [🌐 Click to see online demo.](https://stitch.withgoogle.com/preview/7275437999741914463?node-id=c205bf026b7347f595d487b6c6a4da7f)
+
 </div>
+
+## Preview
+
+| Home | Planner |
+|---|---|
+| ![Home screen](demo/home.png) | ![Planner screen](demo/planner.png) |
+
+| Profile | Tracking |
+|---|---|
+| ![Profile screen](demo/profile.png) | ![Tracking screen](demo/track.png) |
 
 ---
 
@@ -42,6 +55,8 @@ The core idea is simple: **your diet should adapt to your life, not the other wa
 3. A recipe engine that looks at what's already in your fridge and tells you what to cook.
 
 Whether you're a busy professional trying to lose weight sustainably, or a home cook who wants to stop wasting ingredients, CalTrackr meets you where you are.
+
+### [🌐 Click to see online demo.](https://stitch.withgoogle.com/preview/7275437999741914463?node-id=c205bf026b7347f595d487b6c6a4da7f)
 
 ---
 
