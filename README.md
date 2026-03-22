@@ -12,7 +12,7 @@
 *Plan your week. Track your meals. Cook what you already have.*
 
 
-### [🌐 Click to see online demo.](https://stitch.withgoogle.com/preview/7275437999741914463?node-id=c205bf026b7347f595d487b6c6a4da7f)
+### [🌐 Click to see online demo.](https://stitch.withgoogle.com/preview/7275437999741914463?node-id=dce2f597f3354fb28f258dd3cbfd76e5&raw=1)
 
 </div>
 
