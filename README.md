@@ -338,3 +338,7 @@ You are free to use, modify, and distribute this software under the terms of the
 Any derivative work must also be distributed under the same license.
 
 See the full license text in the [LICENSE](LICENSE).
+
+## Oğuz Contribution
+- Added project contribution section
+- Changed this line by Oğuz
