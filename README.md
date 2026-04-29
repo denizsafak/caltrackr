@@ -1,56 +1,85 @@
-# Welcome to your Expo app 👋
+# CalTrackr Expo Product Demo
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+CalTrackr is an Expo React Native app with web support, Firebase Auth, and Firestore persistence. It turns the midterm report into a usable product demo for calorie tracking, weekly planning, recipe search, profile goals, shopping lists, and saved templates.
 
-## Get started
+CalTrackr stores real application data in Firebase Auth and Firestore. The tracker can estimate nutrition from natural-language entries such as `grilled chicken rice bowl`, and the recipe finder can pull live recipes from external APIs.
 
-1. Install dependencies
+Recipe Finder supports pantry-based matching:
 
-   ```bash
-   npm install
-   ```
+- `Best pantry fit` returns only recipes with at least one non-staple pantry match and ranks stronger matches first.
+- `Must include all` returns only recipes containing every selected non-staple ingredient.
+- `Browse all` clears pantry filtering and intentionally shows the full catalog.
+- `MealDB search` only uses TheMealDB so classroom demos do not burn Spoonacular quota.
+- `Both APIs` deliberately searches both TheMealDB and Spoonacular, then pins external API results above the local catalog.
+- API recipe cards open the same detail page as local recipes; the external source link is shown from that detail page.
+- Weekly Planner shows `Regenerate plan` once a plan exists and replaces the week with a fresh randomized breakfast/lunch/dinner plan.
 
-2. Start the app
+The Firestore schema and role model are documented in `docs/firebase-schema.md`.
 
-   ```bash
-   npx expo start
-   ```
+## Local Tooling
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+This workspace uses a user-local Node 22 binary at:
 
 ```bash
-npm run reset-project
+/home/huseyin/.local/node/bin
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Prefix commands with that path if `node` is not installed globally:
 
-### Other setup steps
+```bash
+PATH=/home/huseyin/.local/node/bin:$PATH npm run web
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Run With Firebase
 
-## Learn more
+Create a Firebase project with Authentication and Firestore enabled, then put the web app config in `.env.local`:
 
-To learn more about developing your project with Expo, look at the following resources:
+```text
+EXPO_PUBLIC_USE_FIREBASE_EMULATORS=false
+EXPO_PUBLIC_FIREBASE_API_KEY=...
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=...
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+EXPO_PUBLIC_FIREBASE_APP_ID=...
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Start Expo Web:
 
-## Join the community
+```bash
+PATH=/home/huseyin/.local/node/bin:$PATH npx expo start --web --port 8082
+```
 
-Join our community of developers creating universal apps.
+## Local Emulator Option
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Firebase emulators are still useful for local testing. Set `EXPO_PUBLIC_USE_FIREBASE_EMULATORS=true`, then run `npm run emulators` in a separate terminal.
+
+## Nutrition Estimate APIs
+
+The tracker estimates calories/macros from plain text.
+
+- Preferred: API Ninjas Nutrition with `EXPO_PUBLIC_API_NINJAS_KEY`.
+- Default: USDA FoodData Central with `EXPO_PUBLIC_USDA_API_KEY=DEMO_KEY`.
+- Optional fallback: set `EXPO_PUBLIC_CALORIE_NINJAS_API_KEY` for CalorieNinjas.
+
+For production web builds, put commercial nutrition keys behind a backend or Cloud Function instead of shipping them as public Expo env vars.
+
+## Recipe APIs
+
+- `MealDB search`: TheMealDB free API with `EXPO_PUBLIC_THEMEALDB_API_KEY=1`.
+- `Both APIs`: TheMealDB plus Spoonacular using `EXPO_PUBLIC_SPOONACULAR_API_KEY`.
+- Legacy provider mode is still available in code with `EXPO_PUBLIC_RECIPE_API_PROVIDER`, but the visible app uses the two explicit buttons above.
+
+## Useful URLs
+
+- App: http://localhost:8082
+- Firebase Emulator UI: http://127.0.0.1:4000
+- Auth emulator: http://127.0.0.1:4000/auth
+- Firestore emulator: http://127.0.0.1:4000/firestore
+
+## Checks
+
+```bash
+PATH=/home/huseyin/.local/node/bin:$PATH npm run typecheck
+PATH=/home/huseyin/.local/node/bin:$PATH npm run lint
+```
