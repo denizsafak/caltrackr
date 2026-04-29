@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "CalTrackr",
+    "slug": "caltrackr",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.caltrackr.mvp"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "caltrackr-backend",
+  "version": "1.0.0",
+  "description": "CalTrackr layered Express API with SQLite persistence",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "simulate": "node src/simulateFlow.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.18.3",
+    "sqlite3": "^5.1.7"
+  }
+}
