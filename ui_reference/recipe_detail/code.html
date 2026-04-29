@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed-dim": "#83e8b5",
+              "on-surface": "#2d3335",
+              "inverse-primary": "#a7face",
+              "tertiary-fixed": "#fa7750",
+              "surface-container-high": "#e5e9eb",
+              "on-secondary-fixed": "#00492f",
+              "primary": "#126c4a",
+              "on-tertiary": "#fff7f5",
+              "on-tertiary-fixed-variant": "#531200",
+              "tertiary-fixed-dim": "#e96a45",
+              "secondary-dim": "#00603f",
+              "secondary-container": "#92f7c3",
+              "on-secondary-fixed-variant": "#006946",
+              "on-error-container": "#6e0a12",
+              "inverse-surface": "#0c0f10",
+              "on-background": "#2d3335",
+              "primary-fixed": "#a1f4c8",
+              "surface": "#f8f9fa",
+              "surface-container-highest": "#dee3e6",
+              "error-container": "#fa746f",
+              "on-error": "#fff7f6",
+              "on-surface-variant": "#5a6062",
+              "outline": "#767c7e",
+              "surface-bright": "#f8f9fa",
+              "on-tertiary-fixed": "#000000",
+              "secondary": "#006d48",
+              "outline-variant": "#adb3b5",
+              "on-primary-container": "#005e3e",
+              "surface-container-low": "#f1f4f5",
+              "on-primary-fixed-variant": "#0a6947",
+              "on-primary-fixed": "#004930",
+              "surface-dim": "#d5dbdd",
+              "surface-container-lowest": "#ffffff",
+              "error": "#a83836",
+              "surface-tint": "#126c4a",
+              "on-secondary": "#e6ffee",
+              "error-dim": "#67040d",
+              "surface-variant": "#dee3e6",
+              "tertiary-container": "#fa7750",
+              "on-tertiary-container": "#430c00",
+              "tertiary-dim": "#972f0e",
+              "surface-container": "#ebeef0",
+              "tertiary": "#a73b19",
+              "background": "#f8f9fa",
+              "primary-container": "#a1f4c8",
+              "on-secondary-container": "#005e3e",
+              "on-primary": "#e6ffee",
+              "inverse-on-surface": "#9b9d9e",
+              "secondary-fixed": "#92f7c3",
+              "primary-dim": "#006040",
+              "primary-fixed-dim": "#93e5bb"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-[#f8f9fa] dark:bg-slate-950/70 backdrop-blur-md">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#126c4a] dark:text-[#92f7c3]" data-icon="calendar_today">calendar_today</span>
+<span class="text-xl font-bold tracking-tighter text-[#126c4a] dark:text-[#92f7c3]">CalTrackr</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="hover:opacity-80 transition-opacity text-[#5a6062] dark:text-slate-400">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+<button class="hover:opacity-80 transition-opacity text-[#5a6062] dark:text-slate-400">
+<span class="material-symbols-outlined" data-icon="bookmark_border">bookmark_border</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-20 px-6 max-w-4xl mx-auto">
+<!-- Hero Section -->
+<section class="mb-10">
+<div class="relative w-full aspect-[4/3] md:aspect-[21/9] rounded-lg overflow-hidden shadow-sm">
+<img alt="Harvest Grain Bowl" class="w-full h-full object-cover" data-alt="Vibrant healthy harvest grain bowl with fresh vegetables" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdXenxdLy7DXGpo7J8OjZsm6EaexpULhb9Sq9_Lfnex9DHzXjh7CwNaybd8nVCvKizq5UO0bLh2l13BAm68usprddskKwCV-S2y4K44X-bBJznkOksHdJhKmoLCtciQpRaXldcAS-T2qO66VhyieKEDVuXGRkvUmvK-kpZ0-zWzQU5hhCdPCrCj4SsFYQ0c8oAELdc66sGmpzPYtSqUi86RUSHXP0VOG5xOzy6dpzO4O5Mo9-rsLczhuxHU6p-a2c6vx2FRD6jEn0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+<div class="absolute bottom-6 left-6 text-white">
+<span class="bg-secondary-container/90 text-on-secondary-container px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-2 inline-block">Lunch</span>
+<h1 class="text-3xl md:text-5xl font-extrabold tracking-tight">Harvest Grain Bowl</h1>
+</div>
+</div>
+</section>
+<!-- Nutrition Highlights Grid (Bento Style) -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+<div class="bg-surface-container-low p-6 rounded-lg flex flex-col justify-between">
+<span class="label-md text-on-surface-variant uppercase tracking-wider font-semibold text-[10px]">Calories</span>
+<span class="text-3xl font-bold text-primary mt-2">420</span>
+<span class="text-[11px] text-on-surface-variant mt-1">kcal per serving</span>
+</div>
+<div class="bg-surface-container-low p-6 rounded-lg flex flex-col justify-between">
+<span class="label-md text-on-surface-variant uppercase tracking-wider font-semibold text-[10px]">Prep Time</span>
+<span class="text-3xl font-bold text-on-surface mt-2">15</span>
+<span class="text-[11px] text-on-surface-variant mt-1">minutes prep</span>
+</div>
+<div class="bg-surface-container-low p-6 rounded-lg flex flex-col justify-between">
+<span class="label-md text-on-surface-variant uppercase tracking-wider font-semibold text-[10px]">Carbs</span>
+<span class="text-3xl font-bold text-on-surface mt-2">52<span class="text-sm ml-1 font-medium">g</span></span>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-3">
+<div class="bg-secondary h-full rounded-full" style="width: 65%"></div>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-lg flex flex-col justify-between">
+<span class="label-md text-on-surface-variant uppercase tracking-wider font-semibold text-[10px]">Protein</span>
+<span class="text-3xl font-bold text-on-surface mt-2">18<span class="text-sm ml-1 font-medium">g</span></span>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-3">
+<div class="bg-primary h-full rounded-full" style="width: 40%"></div>
+</div>
+</div>
+</section>
+<!-- Asymmetric Layout: Ingredients & Detailed Macros -->
+<div class="grid md:grid-cols-[1fr_350px] gap-12">
+<!-- Left Column: Ingredients & Instructions -->
+<div class="space-y-12">
+<div>
+<h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="shopping_basket">shopping_basket</span>
+                        Ingredients
+                    </h2>
+<ul class="space-y-4">
+<li class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-md">
+<span class="font-medium">Quinoa, cooked</span>
+<span class="text-on-surface-variant">1 cup</span>
+</li>
+<li class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-md">
+<span class="font-medium">Roasted Sweet Potato</span>
+<span class="text-on-surface-variant">1/2 cup</span>
+</li>
+<li class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-md">
+<span class="font-medium">Baby Spinach</span>
+<span class="text-on-surface-variant">2 cups</span>
+</li>
+<li class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-md">
+<span class="font-medium">Avocado</span>
+<span class="text-on-surface-variant">1/2 large</span>
+</li>
+<li class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-md">
+<span class="font-medium">Tahini Dressing</span>
+<span class="text-on-surface-variant">2 tbsp</span>
+</li>
+</ul>
+</div>
+<div>
+<h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="restaurant">restaurant</span>
+                        Step-by-Step
+                    </h2>
+<div class="space-y-8">
+<div class="flex gap-6">
+<span class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold">1</span>
+<p class="text-lg leading-relaxed text-on-surface-variant">Rinse the quinoa thoroughly and cook according to package instructions until fluffy.</p>
+</div>
+<div class="flex gap-6">
+<span class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold">2</span>
+<p class="text-lg leading-relaxed text-on-surface-variant">Dice the sweet potatoes, toss with olive oil, and roast at 400°F until tender and browned.</p>
+</div>
+<div class="flex gap-6">
+<span class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold">3</span>
+<p class="text-lg leading-relaxed text-on-surface-variant">Whisk together tahini, lemon juice, maple syrup, and warm water for a creamy dressing.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Nutritional Analysis -->
+<aside class="space-y-8">
+<div class="bg-surface-container-lowest p-8 rounded-lg shadow-[0_20px_40px_rgba(45,51,53,0.06)] border border-outline-variant/10">
+<h3 class="text-lg font-bold mb-6">Macro Breakdown</h3>
+<div class="space-y-6">
+<!-- Custom Macro-Bar Component -->
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+<span>Protein</span>
+<span>18g (17%)</span>
+</div>
+<div class="w-full bg-surface-container-high h-3 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 17%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+<span>Carbohydrates</span>
+<span>52g (50%)</span>
+</div>
+<div class="w-full bg-surface-container-high h-3 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 50%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+<span>Healthy Fats</span>
+<span>34g (33%)</span>
+</div>
+<div class="w-full bg-surface-container-high h-3 rounded-full overflow-hidden">
+<div class="bg-tertiary-fixed h-full rounded-full" style="width: 33%"></div>
+</div>
+</div>
+</div>
+<div class="mt-10 pt-8 border-t border-outline-variant/10">
+<h4 class="text-sm font-bold mb-4 uppercase tracking-widest text-on-surface-variant">Micronutrients</h4>
+<div class="space-y-3">
+<div class="flex justify-between text-sm">
+<span>Fiber</span>
+<span class="font-bold">12g</span>
+</div>
+<div class="flex justify-between text-sm">
+<span>Sodium</span>
+<span class="font-bold">140mg</span>
+</div>
+<div class="flex justify-between text-sm">
+<span>Iron</span>
+<span class="font-bold">25% DV</span>
+</div>
+</div>
+</div>
+<!-- Log Meal Button with Gradient Soul -->
+<button class="w-full mt-10 py-4 px-6 rounded-full bg-gradient-to-br from-[#126c4a] to-[#006040] text-on-primary font-bold shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="add_task">add_task</span>
+                        Log this meal
+                    </button>
+</div>
+<!-- Pro Tip Card -->
+<div class="bg-secondary-container/30 p-6 rounded-lg">
+<h4 class="font-bold text-on-secondary-container flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-sm" data-icon="lightbulb">lightbulb</span>
+                        Chef's Tip
+                    </h4>
+<p class="text-sm text-on-secondary-container/80 italic">To save time, roast a double batch of sweet potatoes on Sunday for quick assembly all week.</p>
+</div>
+</aside>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-[#f8f9fa]/70 dark:bg-slate-950/70 backdrop-blur-md shadow-[0_-10px_40px_rgba(45,51,53,0.04)] rounded-t-[2rem]">
+<div class="flex justify-around items-center px-4 pb-6 pt-2 max-w-7xl mx-auto">
+<a class="flex flex-col items-center justify-center text-[#5a6062] dark:text-slate-400 px-3 py-1 hover:bg-[#f1f4f5] dark:hover:bg-slate-800 rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#5a6062] dark:text-slate-400 px-3 py-1 hover:bg-[#f1f4f5] dark:hover:bg-slate-800 rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Planner</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#5a6062] dark:text-slate-400 px-3 py-1 hover:bg-[#f1f4f5] dark:hover:bg-slate-800 rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="add_circle" style="font-size: 32px;">add_circle</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Track</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#126c4a] dark:text-[#92f7c3] bg-[#92f7c3]/20 dark:bg-[#126c4a]/30 rounded-2xl px-3 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Recipes</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#5a6062] dark:text-slate-400 px-3 py-1 hover:bg-[#f1f4f5] dark:hover:bg-slate-800 rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CalTrackr Weekly Diet Planner</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed-dim": "#83e8b5",
+              "on-surface": "#2d3335",
+              "inverse-primary": "#a7face",
+              "tertiary-fixed": "#fa7750",
+              "surface-container-high": "#e5e9eb",
+              "on-secondary-fixed": "#00492f",
+              "primary": "#126c4a",
+              "on-tertiary": "#fff7f5",
+              "on-tertiary-fixed-variant": "#531200",
+              "tertiary-fixed-dim": "#e96a45",
+              "secondary-dim": "#00603f",
+              "secondary-container": "#92f7c3",
+              "on-secondary-fixed-variant": "#006946",
+              "on-error-container": "#6e0a12",
+              "inverse-surface": "#0c0f10",
+              "on-background": "#2d3335",
+              "primary-fixed": "#a1f4c8",
+              "surface": "#f8f9fa",
+              "surface-container-highest": "#dee3e6",
+              "error-container": "#fa746f",
+              "on-error": "#fff7f6",
+              "on-surface-variant": "#5a6062",
+              "outline": "#767c7e",
+              "surface-bright": "#f8f9fa",
+              "on-tertiary-fixed": "#000000",
+              "secondary": "#006d48",
+              "outline-variant": "#adb3b5",
+              "on-primary-container": "#005e3e",
+              "surface-container-low": "#f1f4f5",
+              "on-primary-fixed-variant": "#0a6947",
+              "on-primary-fixed": "#004930",
+              "surface-dim": "#d5dbdd",
+              "surface-container-lowest": "#ffffff",
+              "error": "#a83836",
+              "surface-tint": "#126c4a",
+              "on-secondary": "#e6ffee",
+              "error-dim": "#67040d",
+              "surface-variant": "#dee3e6",
+              "tertiary-container": "#fa7750",
+              "on-tertiary-container": "#430c00",
+              "tertiary-dim": "#972f0e",
+              "surface-container": "#ebeef0",
+              "tertiary": "#a73b19",
+              "background": "#f8f9fa",
+              "primary-container": "#a1f4c8",
+              "on-secondary-container": "#005e3e",
+              "on-primary": "#e6ffee",
+              "inverse-on-surface": "#9b9d9e",
+              "secondary-fixed": "#92f7c3",
+              "primary-dim": "#006040",
+              "primary-fixed-dim": "#93e5bb"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32 selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 bg-[#f8f9fa] dark:bg-slate-950/70 backdrop-blur-md">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#126c4a] dark:text-[#92f7c3]" data-icon="calendar_today">calendar_today</span>
+<h1 class="text-xl font-bold tracking-tighter text-[#126c4a] dark:text-[#92f7c3]">CalTrackr</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="hover:opacity-80 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#2d3335] dark:text-slate-100" data-icon="notifications">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 pt-8">
+<!-- Hero Header Section -->
+<section class="mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<p class="text-on-surface-variant font-medium tracking-wide uppercase text-xs mb-2">Weekly Planner</p>
+<h2 class="text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface">Oct 23 — Oct 29</h2>
+</div>
+<div class="flex flex-wrap gap-3">
+<button class="bg-surface-container-high text-on-surface px-6 py-3 rounded-full font-semibold flex items-center gap-2 hover:bg-surface-container-highest transition-colors active:scale-95">
+<span class="material-symbols-outlined text-lg" data-icon="save">save</span>
+                        Save as template
+                    </button>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-semibold flex items-center gap-2 shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity active:scale-95 bg-gradient-to-br from-primary to-primary-dim">
+<span class="material-symbols-outlined text-lg" data-icon="bolt">bolt</span>
+                        Generate Plan
+                    </button>
+</div>
+</div>
+</section>
+<!-- Stats Overview Bento -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<div class="bg-surface-container-low rounded-lg p-8 flex flex-col justify-between min-h-[160px]">
+<span class="text-on-surface-variant text-sm font-medium">Daily Average Goal</span>
+<div class="mt-4">
+<span class="text-4xl font-bold tracking-tighter text-on-surface">2,150</span>
+<span class="text-on-surface-variant ml-1 font-medium text-sm">kcal</span>
+</div>
+</div>
+<div class="bg-secondary-container rounded-lg p-8 flex flex-col justify-between min-h-[160px]">
+<span class="text-on-secondary-container text-sm font-medium">Protein Target</span>
+<div class="mt-4">
+<div class="flex items-end gap-2 mb-3">
+<span class="text-4xl font-bold tracking-tighter text-on-secondary-container">165</span>
+<span class="text-on-secondary-container font-medium text-sm mb-1">g / day</span>
+</div>
+<div class="w-full h-2 bg-on-secondary-container/10 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-3/4 rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-8 flex items-center justify-between border border-outline-variant/10 shadow-sm">
+<div>
+<span class="text-on-surface-variant text-sm font-medium block mb-1">Shopping List</span>
+<p class="text-on-surface font-semibold">42 Ingredients ready</p>
+</div>
+<button class="bg-tertiary-container text-on-tertiary-container p-4 rounded-full hover:opacity-90 transition-opacity active:scale-95">
+<span class="material-symbols-outlined" data-icon="shopping_basket">shopping_basket</span>
+</button>
+</div>
+</div>
+<!-- 7-Day Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-7 gap-4">
+<!-- Day Card Generator - Repeating for Mon-Sun with logic -->
+<!-- Monday -->
+<div class="flex flex-col gap-4">
+<div class="px-2">
+<h3 class="font-bold text-on-surface">Mon</h3>
+<p class="text-xs text-on-surface-variant font-medium">23 OCT</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-4 flex flex-col gap-3 min-h-[400px]">
+<!-- Breakfast -->
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm group cursor-pointer hover:ring-1 ring-primary/20 transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold uppercase tracking-wider text-primary">Breakfast</span>
+<span class="material-symbols-outlined text-xs text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity" data-icon="swap_horiz">swap_horiz</span>
+</div>
+<p class="text-sm font-semibold text-on-surface leading-snug">Avocado &amp; Egg Sourdough</p>
+<p class="text-xs text-on-surface-variant mt-1">420 kcal</p>
+</div>
+<!-- Lunch -->
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm group cursor-pointer hover:ring-1 ring-primary/20 transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold uppercase tracking-wider text-primary">Lunch</span>
+<span class="material-symbols-outlined text-xs text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity" data-icon="swap_horiz">swap_horiz</span>
+</div>
+<p class="text-sm font-semibold text-on-surface leading-snug">Quinoa Buddha Bowl</p>
+<p class="text-xs text-on-surface-variant mt-1">580 kcal</p>
+</div>
+<!-- Dinner -->
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm group cursor-pointer hover:ring-1 ring-primary/20 transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold uppercase tracking-wider text-primary">Dinner</span>
+<span class="material-symbols-outlined text-xs text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity" data-icon="swap_horiz">swap_horiz</span>
+</div>
+<p class="text-sm font-semibold text-on-surface leading-snug">Grilled Salmon &amp; Asparagus</p>
+<p class="text-xs text-on-surface-variant mt-1">640 kcal</p>
+</div>
+<!-- Footer Daily Total -->
+<div class="mt-auto pt-4 border-t border-outline-variant/10">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase">Total</span>
+<span class="text-sm font-extrabold text-on-surface">1,640</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tuesday (Active/Selected State) -->
+<div class="flex flex-col gap-4">
+<div class="px-2">
+<h3 class="font-bold text-primary">Tue</h3>
+<p class="text-xs text-on-surface-variant font-medium">24 OCT</p>
+</div>
+<div class="bg-surface-container-lowest ring-2 ring-primary/10 rounded-lg p-4 flex flex-col gap-3 min-h-[400px] shadow-xl shadow-primary/5">
+<div class="bg-surface-container-low p-4 rounded-md group cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold uppercase tracking-wider text-primary">Breakfast</span>
+<span class="material-symbols-outlined text-xs text-on-surface-variant" data-icon="edit">edit</span>
+</div>
+<p class="text-sm font-semibold text-on-surface leading-snug">Greek Yogurt Parfait</p>
+<p class="text-xs text-on-surface-variant mt-1">310 kcal</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-md group cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold uppercase tracking-wider text-primary">Lunch</span>
+<span class="material-symbols-outlined text-xs text-on-surface-variant" data-icon="edit">edit</span>
+</div>
+<p class="text-sm font-semibold text-on-surface leading-snug">Chicken Caesar Wrap</p>
+<p class="text-xs text-on-surface-variant mt-1">520 kcal</p>
+</div>
+<div class="border-2 border-dashed border-outline-variant/30 p-4 rounded-md flex flex-col items-center justify-center gap-2 group cursor-pointer hover:border-primary/40 transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" data-icon="add_circle">add_circle</span>
+<span class="text-[10px] font-bold uppercase text-on-surface-variant">Add Dinner</span>
+</div>
+<div class="mt-auto pt-4">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase">Total</span>
+<span class="text-sm font-extrabold text-on-surface">830</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Wednesday -->
+<div class="flex flex-col gap-4">
+<div class="px-2">
+<h3 class="font-bold text-on-surface">Wed</h3>
+<p class="text-xs text-on-surface-variant font-medium">25 OCT</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-4 flex flex-col gap-3 min-h-[400px]">
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Oatmeal &amp; Berries</p>
+<p class="text-xs text-on-surface-variant mt-1">350 kcal</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Lentil Soup</p>
+<p class="text-xs text-on-surface-variant mt-1">440 kcal</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Tofu Stir Fry</p>
+<p class="text-xs text-on-surface-variant mt-1">510 kcal</p>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/10">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase">Total</span>
+<span class="text-sm font-extrabold text-on-surface">1,300</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Thursday -->
+<div class="flex flex-col gap-4">
+<div class="px-2">
+<h3 class="font-bold text-on-surface">Thu</h3>
+<p class="text-xs text-on-surface-variant font-medium">26 OCT</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-4 flex flex-col gap-3 min-h-[400px]">
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Protein Smoothie</p>
+<p class="text-xs text-on-surface-variant mt-1">290 kcal</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Turkey Club</p>
+<p class="text-xs text-on-surface-variant mt-1">610 kcal</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Beef &amp; Broccoli</p>
+<p class="text-xs text-on-surface-variant mt-1">680 kcal</p>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/10">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase">Total</span>
+<span class="text-sm font-extrabold text-on-surface">1,580</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Friday -->
+<div class="flex flex-col gap-4">
+<div class="px-2">
+<h3 class="font-bold text-on-surface">Fri</h3>
+<p class="text-xs text-on-surface-variant font-medium">27 OCT</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-4 flex flex-col gap-3 min-h-[400px]">
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Scrambled Eggs</p>
+<p class="text-xs text-on-surface-variant mt-1">380 kcal</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Poke Bowl</p>
+<p class="text-xs text-on-surface-variant mt-1">540 kcal</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Homemade Pizza</p>
+<p class="text-xs text-on-surface-variant mt-1">820 kcal</p>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/10">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase">Total</span>
+<span class="text-sm font-extrabold text-on-surface">1,740</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Saturday -->
+<div class="flex flex-col gap-4">
+<div class="px-2">
+<h3 class="font-bold text-on-surface">Sat</h3>
+<p class="text-xs text-on-surface-variant font-medium">28 OCT</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-4 flex flex-col gap-3 min-h-[400px]">
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Pancakes &amp; Fruit</p>
+<p class="text-xs text-on-surface-variant mt-1">450 kcal</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Grilled Veggie Sandwich</p>
+<p class="text-xs text-on-surface-variant mt-1">410 kcal</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Pasta Carbonara</p>
+<p class="text-xs text-on-surface-variant mt-1">790 kcal</p>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/10">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase">Total</span>
+<span class="text-sm font-extrabold text-on-surface">1,650</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Sunday -->
+<div class="flex flex-col gap-4">
+<div class="px-2">
+<h3 class="font-bold text-on-surface">Sun</h3>
+<p class="text-xs text-on-surface-variant font-medium">29 OCT</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-4 flex flex-col gap-3 min-h-[400px]">
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">French Toast</p>
+<p class="text-xs text-on-surface-variant mt-1">520 kcal</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Roast Chicken</p>
+<p class="text-xs text-on-surface-variant mt-1">680 kcal</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<p class="text-sm font-semibold text-on-surface">Light Salad</p>
+<p class="text-xs text-on-surface-variant mt-1">320 kcal</p>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/10">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase">Total</span>
+<span class="text-sm font-extrabold text-on-surface">1,520</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Export Floating Button Section (Contextual) -->
+<div class="mt-16 bg-surface-container-low rounded-lg p-8 flex flex-col md:flex-row items-center justify-between gap-8 border border-outline-variant/5">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl" data-icon="checklist">checklist</span>
+</div>
+<div>
+<h4 class="text-xl font-bold text-on-surface">Weekly Shopping List Ready</h4>
+<p class="text-on-surface-variant">We've calculated all 18 meals for the upcoming week.</p>
+</div>
+</div>
+<button class="w-full md:w-auto bg-surface-container-lowest text-primary border border-primary/20 px-8 py-4 rounded-full font-bold flex items-center justify-center gap-3 hover:bg-on-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+                Export to shopping list
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#f8f9fa]/70 dark:bg-slate-950/70 backdrop-blur-md rounded-t-[2rem] shadow-[0_-10px_40px_rgba(45,51,53,0.04)]">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center text-[#5a6062] dark:text-slate-400 px-3 py-1 hover:bg-[#f1f4f5] dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Home</span>
+</a>
+<!-- Planner (Active) -->
+<a class="flex flex-col items-center justify-center text-[#126c4a] dark:text-[#92f7c3] bg-[#92f7c3]/20 dark:bg-[#126c4a]/30 rounded-2xl px-3 py-1 active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Planner</span>
+</a>
+<!-- Track -->
+<a class="flex flex-col items-center justify-center text-[#5a6062] dark:text-slate-400 px-3 py-1 hover:bg-[#f1f4f5] dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Track</span>
+</a>
+<!-- Recipes -->
+<a class="flex flex-col items-center justify-center text-[#5a6062] dark:text-slate-400 px-3 py-1 hover:bg-[#f1f4f5] dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Recipes</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-[#5a6062] dark:text-slate-400 px-3 py-1 hover:bg-[#f1f4f5] dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Profile</span>
+</a>
+</nav>
+</body></html>
