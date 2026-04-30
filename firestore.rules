@@ -1,0 +1,104 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owns(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function hasProfile() {
+      return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function currentUser() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function admin() {
+      return hasProfile() && currentUser().data.role == 'admin';
+    }
+
+    function assignedDietitian(uid) {
+      return hasProfile() &&
+        currentUser().data.role == 'dietitian' &&
+        exists(/databases/$(database)/documents/users/$(uid)) &&
+        get(/databases/$(database)/documents/users/$(uid)).data.dietitianId == request.auth.uid;
+    }
+
+    function assignedDietitianProfileRead() {
+      return hasProfile() &&
+        currentUser().data.role == 'dietitian' &&
+        resource.data.dietitianId == request.auth.uid;
+    }
+
+    function validSelfCreate(uid) {
+      return owns(uid) &&
+        request.resource.data.role == 'user' &&
+        !request.resource.data.keys().hasAny(['clientIds']);
+    }
+
+    function keepsRoleAssignmentStable() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'role',
+        'dietitianId',
+        'clientIds'
+      ]);
+    }
+
+    function validOwnerProfileUpdate() {
+      return keepsRoleAssignmentStable() &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'email',
+          'createdAt'
+        ]);
+    }
+
+    function validAdminRole(role) {
+      return role in ['user', 'dietitian', 'admin'];
+    }
+
+    function validAdminUserWrite() {
+      return request.resource.data.role == null || validAdminRole(request.resource.data.role);
+    }
+
+    match /recipes/{recipeId} {
+      allow read: if signedIn();
+      allow create, update, delete: if admin();
+    }
+
+    match /users/{uid} {
+      allow create: if validSelfCreate(uid) || (admin() && validAdminUserWrite());
+      allow read: if owns(uid) || admin() || assignedDietitianProfileRead();
+      allow update: if (admin() && validAdminUserWrite()) || (owns(uid) && validOwnerProfileUpdate());
+      allow delete: if admin();
+
+      match /mealLogs/{logId} {
+        allow read: if owns(uid) || admin() || assignedDietitian(uid);
+        allow write: if owns(uid) || admin();
+      }
+
+      match /weeklyPlans/{planId} {
+        allow read: if owns(uid) || admin() || assignedDietitian(uid);
+        allow write: if owns(uid) || admin() || assignedDietitian(uid);
+      }
+
+      match /planTemplates/{templateId} {
+        allow read: if owns(uid) || admin() || assignedDietitian(uid);
+        allow write: if owns(uid) || admin() || assignedDietitian(uid);
+      }
+
+      match /shoppingLists/{listId} {
+        allow read: if owns(uid) || admin() || assignedDietitian(uid);
+        allow write: if owns(uid) || admin() || assignedDietitian(uid);
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
