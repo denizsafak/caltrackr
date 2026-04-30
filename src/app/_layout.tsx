@@ -21,19 +21,15 @@ SplashScreen.preventAutoHideAsync();
 const isWeb = Platform.OS === 'web';
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts(
-    isWeb
-      ? {}
-      : {
-          Inter_400Regular,
-          Inter_500Medium,
-          Inter_600SemiBold,
-          Inter_700Bold,
-          Inter_800ExtraBold,
-        },
-  );
+  const [loaded, error] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    Inter_800ExtraBold,
+  });
 
-  const ready = isWeb || loaded || !!error;
+  const ready = loaded || !!error;
 
   useEffect(() => {
     if (ready) {
