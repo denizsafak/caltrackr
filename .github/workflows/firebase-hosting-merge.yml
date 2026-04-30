@@ -19,11 +19,6 @@ jobs:
       - name: Build Web App
         run: npx expo export -p web
       - name: Deploy to Firebase
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          channelId: live
-          projectId: caltrackr-b020f
+        run: npx firebase-tools deploy --only hosting
         env:
-          FIREBASE_CLI_EXPERIMENTS: webframeworks
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
