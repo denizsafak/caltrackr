@@ -6,7 +6,7 @@ import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Protected } from '@/components/protected';
 import { AppShell, Button, Card, Chip, Field, LoadingState, MacroBars, PageHeader, ProgressBar, SectionTitle } from '@/components/ui';
 import { colors, fonts, formatCalories, radii, spacing } from '@/constants/theme';
-import { useAppData } from '@/context/app-data';
+import { useAppData, normalizePlanMeal } from '@/context/app-data';
 import { todayISO } from '@/data/defaults';
 import { estimateNutrition, estimateToMealDraft } from '@/services/nutrition';
 import { MealDraft, MealLog, MealType } from '@/types/domain';
@@ -32,10 +32,12 @@ export default function TrackerScreen() {
 }
 
 function TrackerContent() {
-  const { profile, todayMeals, mealLogs, totals, loading, logMeal, updateMeal, deleteMeal } = useAppData();
+  const { profile, todayMeals, mealLogs, totals, loading, logMeal, updateMeal, deleteMeal, activePlan, recipes } = useAppData();
   const params = useLocalSearchParams();
   const [draft, setDraft] = useState<MealDraft>(emptyDraft);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [reviewQueue, setReviewQueue] = useState<MealDraft[]>([]);
+  const [totalInQueue, setTotalInQueue] = useState(0);
   const [estimateQuery, setEstimateQuery] = useState('');
   const [estimateSource, setEstimateSource] = useState('');
   const [estimating, setEstimating] = useState(false);
@@ -91,8 +93,31 @@ function TrackerContent() {
         date: todayISO(),
       });
       router.setParams({ action: '' });
+    } else if (params.action === 'logPlanDay' && params.date && activePlan) {
+      const targetDay = activePlan.days.find(d => d.date === params.date);
+      if (targetDay && targetDay.meals.length > 0) {
+        const queueDrafts = targetDay.meals.map(meal => {
+          const log = normalizePlanMeal(targetDay.date, meal, activePlan.id, recipes);
+          return {
+            title: log.title,
+            mealType: log.mealType,
+            calories: log.calories,
+            protein: log.macros.protein,
+            carbs: log.macros.carbs,
+            fats: log.macros.fats,
+            ingredients: Array.isArray(log.ingredients) ? log.ingredients.join(', ') : log.ingredients,
+            recipeId: log.recipeId,
+            date: log.date,
+          };
+        });
+        setReviewQueue(queueDrafts.slice(1));
+        setDraft(queueDrafts[0]);
+        setTotalInQueue(queueDrafts.length);
+        setEditingId(null);
+      }
+      router.setParams({ action: '', date: '' });
     }
-  }, [params.action, params.calories, params.carbs, params.fats, params.ingredients, params.mealType, params.protein, params.recipeId, params.title]);
+  }, [params.action, params.calories, params.carbs, params.date, params.fats, params.ingredients, params.mealType, params.protein, params.recipeId, params.title, activePlan, recipes]);
 
   const groupedLogs = useMemo(() => {
     const groups: Record<string, { date: string, logs: MealLog[], totals: { calories: number; protein: number; carbs: number; fats: number } }> = {};
@@ -118,11 +143,28 @@ function TrackerContent() {
     }
     if (editingId) {
       await updateMeal(editingId, draft);
+      setDraft(emptyDraft);
+      setEditingId(null);
     } else {
       await logMeal(draft);
+      if (reviewQueue.length > 0) {
+        setDraft(reviewQueue[0]);
+        setReviewQueue(reviewQueue.slice(1));
+      } else {
+        setDraft(emptyDraft);
+        setTotalInQueue(0);
+      }
     }
-    setDraft(emptyDraft);
-    setEditingId(null);
+  };
+
+  const skipQueueItem = () => {
+    if (reviewQueue.length > 0) {
+      setDraft(reviewQueue[0]);
+      setReviewQueue(reviewQueue.slice(1));
+    } else {
+      setDraft(emptyDraft);
+      setTotalInQueue(0);
+    }
   };
 
   const estimateMeal = async () => {
@@ -165,7 +207,9 @@ function TrackerContent() {
 
       <View style={styles.grid}>
         <Card style={styles.formCard}>
-          <SectionTitle title={editingId ? 'Edit meal' : 'Log a meal'} />
+          <SectionTitle 
+            title={totalInQueue > 0 ? `Reviewing meal ${totalInQueue - reviewQueue.length} of ${totalInQueue}` : editingId ? 'Edit meal' : 'Log a meal'} 
+          />
           <View style={styles.estimatePanel}>
             <Field
               label="Describe meal"
@@ -219,7 +263,7 @@ function TrackerContent() {
             placeholder="chicken, spinach, quinoa"
           />
           <View style={styles.actionRow}>
-            <Button onPress={submit}>{editingId ? 'Save changes' : 'Log meal'}</Button>
+            <Button onPress={submit}>{editingId ? 'Save changes' : totalInQueue > 0 ? 'Log & next' : 'Log meal'}</Button>
             {editingId ? (
               <Button
                 variant="secondary"
@@ -228,6 +272,11 @@ function TrackerContent() {
                   setDraft(emptyDraft);
                 }}>
                 Cancel
+              </Button>
+            ) : null}
+            {totalInQueue > 0 ? (
+              <Button variant="secondary" onPress={skipQueueItem}>
+                Skip
               </Button>
             ) : null}
           </View>

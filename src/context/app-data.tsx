@@ -22,7 +22,6 @@ import {
   addDaysISO,
   buildPlanFromRecipes,
   buildShoppingList,
-  buildTemplateFromPlan,
   defaultProfile,
   todayISO,
 } from '@/data/defaults';
@@ -30,7 +29,7 @@ import recipeCatalog from '../../data/recipe-catalog.json';
 import { useAuth } from '@/context/auth';
 import { db } from '@/lib/firebase';
 import { getExternalRecipeById, searchExternalRecipes } from '@/services/recipes';
-import { MealDraft, MealLog, MealType, PlanMeal, PlanTemplate, Recipe, ShoppingList, UserProfile, UserRole, WeeklyPlan } from '@/types/domain';
+import { MealDraft, MealLog, MealType, PlanMeal, Recipe, ShoppingList, UserProfile, UserRole, WeeklyPlan } from '@/types/domain';
 
 type AppDataContextValue = {
   profile: UserProfile | null;
@@ -38,7 +37,6 @@ type AppDataContextValue = {
   assignedClients: UserProfile[];
   mealLogs: MealLog[];
   weeklyPlans: WeeklyPlan[];
-  templates: PlanTemplate[];
   shoppingLists: ShoppingList[];
   activePlan: WeeklyPlan | null;
   activeShoppingList: ShoppingList | null;
@@ -59,9 +57,7 @@ type AppDataContextValue = {
   generatePlan: () => Promise<void>;
   deletePlan: (id: string) => Promise<void>;
   swapMeal: (dayDate: string, mealId: string) => Promise<void>;
-  saveTemplate: (title?: string) => Promise<void>;
-  loadTemplate: (templateId: string) => Promise<void>;
-  deleteTemplate: (templateId: string) => Promise<void>;
+  savePlan: (title?: string) => Promise<void>;
   loadPlan: (planId: string) => Promise<void>;
   buildClientPlanDraft: (clientId: string, mode: 'current' | 'auto' | 'empty') => Promise<WeeklyPlan>;
   savePlanForClient: (clientId: string, plan: WeeklyPlan) => Promise<void>;
@@ -119,7 +115,7 @@ const estimateMacrosFromCalories = (calories: number) => ({
   fats: Math.round((calories * 0.3) / 9),
 });
 
-function normalizePlanMeal(dayDate: string, meal: PlanMeal, planId: string, recipes: Recipe[]): Omit<MealLog, 'id'> {
+export function normalizePlanMeal(dayDate: string, meal: PlanMeal, planId: string, recipes: Recipe[]): Omit<MealLog, 'id'> {
   const recipe = meal.recipeId ? recipes.find((item) => item.id === meal.recipeId) : undefined;
   const log: Omit<MealLog, 'id'> = {
     date: dayDate,
@@ -297,7 +293,6 @@ export function AppDataProvider({ children }: PropsWithChildren) {
   const [assignedClients, setAssignedClients] = useState<UserProfile[]>([]);
   const [mealLogs, setMealLogs] = useState<MealLog[]>([]);
   const [weeklyPlans, setWeeklyPlans] = useState<WeeklyPlan[]>([]);
-  const [templates, setTemplates] = useState<PlanTemplate[]>([]);
   const [shoppingLists, setShoppingLists] = useState<ShoppingList[]>([]);
   const [allUsers, setAllUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -327,7 +322,6 @@ export function AppDataProvider({ children }: PropsWithChildren) {
       setAssignedClients([]);
       setMealLogs([]);
       setWeeklyPlans([]);
-      setTemplates([]);
       setShoppingLists([]);
       setAllUsers([]);
       setLoading(false);
@@ -373,13 +367,6 @@ export function AppDataProvider({ children }: PropsWithChildren) {
           setWeeklyPlans(sortPlans(snapshot.docs.map((item) => ({ id: item.id, ...item.data() }) as WeeklyPlan)));
         },
         handleSnapshotError('weekly plans'),
-      ),
-      onSnapshot(
-        collection(db, 'users', user.uid, 'planTemplates'),
-        (snapshot) => {
-          setTemplates(snapshot.docs.map((item) => ({ id: item.id, ...item.data() }) as PlanTemplate));
-        },
-        handleSnapshotError('plan templates'),
       ),
       onSnapshot(
         collection(db, 'users', user.uid, 'shoppingLists'),
@@ -625,33 +612,18 @@ export function AppDataProvider({ children }: PropsWithChildren) {
     [activePlan, profile, recipes, requireUser],
   );
 
-  const saveTemplate = useCallback(async (title?: string) => {
+  const savePlan = useCallback(async (title?: string) => {
     const uid = requireUser();
     if (!activePlan) return;
-    const template = buildTemplateFromPlan(activePlan, title);
+    
+    const plan: WeeklyPlan = {
+      ...activePlan,
+      id: `plan-${Date.now()}`,
+      title: title || `${activePlan.title} (saved)`,
+    };
 
-    await setDoc(doc(db, 'users', uid, 'planTemplates', template.id), { ...template, createdAt: serverTimestamp() });
+    await setDoc(doc(db, 'users', uid, 'weeklyPlans', plan.id), { ...plan, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
   }, [activePlan, requireUser]);
-
-  const loadTemplate = useCallback(
-    async (templateId: string) => {
-      const uid = requireUser();
-      const template = templates.find((item) => item.id === templateId);
-      if (!template) return;
-      const start = todayISO();
-      const plan: WeeklyPlan = {
-        id: `week-${start}`,
-        title: template.title,
-        weekStart: start,
-        days: template.days.map((day, index) => ({
-          ...day,
-          date: addDaysISO(start, index),
-        })),
-      };
-      await setDoc(doc(db, 'users', uid, 'weeklyPlans', plan.id), { ...plan, createdAt: serverTimestamp() }, { merge: true });
-    },
-    [requireUser, templates],
-  );
 
   const loadPlan = useCallback(
     async (planId: string) => {
@@ -673,13 +645,7 @@ export function AppDataProvider({ children }: PropsWithChildren) {
     [requireUser, weeklyPlans],
   );
 
-  const deleteTemplate = useCallback(
-    async (templateId: string) => {
-      const uid = requireUser();
-      await deleteDoc(doc(db, 'users', uid, 'planTemplates', templateId));
-    },
-    [requireUser],
-  );
+
 
   const buildClientPlanDraft = useCallback(
     async (clientId: string, mode: 'current' | 'auto' | 'empty'): Promise<WeeklyPlan> => {
@@ -912,7 +878,6 @@ export function AppDataProvider({ children }: PropsWithChildren) {
       assignedClients,
       mealLogs,
       weeklyPlans,
-      templates,
       shoppingLists,
       activePlan,
       activeShoppingList,
@@ -928,9 +893,7 @@ export function AppDataProvider({ children }: PropsWithChildren) {
       generatePlan,
       deletePlan,
       swapMeal,
-      saveTemplate,
-      loadTemplate,
-      deleteTemplate,
+      savePlan,
       loadPlan,
       buildClientPlanDraft,
       savePlanForClient,
@@ -953,11 +916,9 @@ export function AppDataProvider({ children }: PropsWithChildren) {
       cookAndLog,
       deleteMeal,
       deletePlan,
-      deleteTemplate,
       deleteUserAccount,
       generatePlan,
       generateShoppingList,
-      loadTemplate,
       loadPlan,
       loading,
       logPlanDay,
@@ -967,11 +928,10 @@ export function AppDataProvider({ children }: PropsWithChildren) {
       profile,
       recipes,
       savePlanForClient,
-      saveTemplate,
+      savePlan,
       setUserRole,
       shoppingLists,
       swapMeal,
-      templates,
       todayMeals,
       toggleShoppingItem,
       totals,

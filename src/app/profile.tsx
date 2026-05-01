@@ -19,7 +19,7 @@ export default function ProfileScreen() {
 
 function ProfileContent() {
   const { signOut } = useAuth();
-  const { profile, weeklyPlans, templates, totals, loading, updateProfile } = useAppData();
+  const { profile, weeklyPlans, totals, loading, updateProfile } = useAppData();
   const [dailyGoal, setDailyGoal] = useState('');
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');

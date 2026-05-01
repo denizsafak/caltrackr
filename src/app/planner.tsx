@@ -34,15 +34,12 @@ function PlannerContent() {
     weeklyPlans,
     mealLogs,
     recipes,
-    templates,
     loading,
     generatePlan,
     deletePlan,
     swapMeal,
     choosePlanMeal,
-    saveTemplate,
-    loadTemplate,
-    deleteTemplate,
+    savePlan,
     generateShoppingList,
     logPlanDay,
     loadPlan,
@@ -52,12 +49,11 @@ function PlannerContent() {
   const [pickerMealType, setPickerMealType] = useState<MealType>('Breakfast');
   const [recipeSearch, setRecipeSearch] = useState('');
   const [choosingRecipe, setChoosingRecipe] = useState<string | null>(null);
-  const [templateName, setTemplateName] = useState('');
+  const [planName, setPlanName] = useState('');
   const [generatingPlan, setGeneratingPlan] = useState(false);
-  const [savingTemplate, setSavingTemplate] = useState(false);
+  const [savingPlan, setSavingPlan] = useState(false);
   const [buildingShoppingList, setBuildingShoppingList] = useState(false);
   const [deletingPlanId, setDeletingPlanId] = useState<string | null>(null);
-  const [deletingTemplateId, setDeletingTemplateId] = useState<string | null>(null);
   const [swappingMealId, setSwappingMealId] = useState<string | null>(null);
 
   const loggedPlanMeals = useMemo(() => {
@@ -89,6 +85,20 @@ function PlannerContent() {
       )
     : 0;
 
+  const handleSavePlan = async () => {
+    if (!activePlan) return;
+    setSavingPlan(true);
+    try {
+      await savePlan(planName);
+      setPlanName('');
+      Alert.alert('Plan saved', 'Your meal plan has been saved and can be loaded anytime.');
+    } catch (error) {
+      Alert.alert('Could not save plan', error instanceof Error ? error.message : 'Try again in a moment.');
+    } finally {
+      setSavingPlan(false);
+    }
+  };
+
   const handleGeneratePlan = async () => {
     setGeneratingPlan(true);
     try {
@@ -111,41 +121,14 @@ function PlannerContent() {
     }
   };
 
-  const handleDeleteTemplate = async (templateId: string) => {
-    setDeletingTemplateId(templateId);
-    try {
-      await deleteTemplate(templateId);
-    } catch (error) {
-      Alert.alert('Could not delete template', error instanceof Error ? error.message : 'Try again in a moment.');
-    } finally {
-      setDeletingTemplateId(null);
-    }
-  };
-
-  const handleSaveTemplate = async () => {
-    if (!activePlan) return;
-    setSavingTemplate(true);
-    try {
-      await saveTemplate(templateName);
-      setTemplateName('');
-      Alert.alert('Template saved', 'Your weekly plan template is ready to reuse.');
-    } catch (error) {
-      Alert.alert('Could not save template', error instanceof Error ? error.message : 'Try again in a moment.');
-    } finally {
-      setSavingTemplate(false);
-    }
-  };
-
   const handleLogDay = async (dayDate: string) => {
-    setLoggingDay(dayDate);
-    try {
-      const count = await logPlanDay(dayDate);
-      Alert.alert('Day logged', `${count} planned meals were added to your journal.`);
-    } catch (error) {
-      Alert.alert('Could not log day', error instanceof Error ? error.message : 'Try again in a moment.');
-    } finally {
-      setLoggingDay(null);
-    }
+    router.push({
+      pathname: '/tracker',
+      params: {
+        action: 'logPlanDay',
+        date: dayDate,
+      },
+    });
   };
 
   const handleGenerateShoppingList = async () => {
@@ -344,6 +327,20 @@ function PlannerContent() {
 
       <View style={styles.templates}>
         <SectionTitle title="Saved meal plans" />
+        {activePlan ? (
+          <Card tone="low" style={styles.templateSaveCard}>
+            <Field
+              label="Plan name"
+              value={planName}
+              onChangeText={setPlanName}
+              placeholder="High protein week, cutting plan..."
+              style={styles.templateNameField}
+            />
+            <Button icon={Save} onPress={handleSavePlan} disabled={savingPlan}>
+              {savingPlan ? 'Saving...' : 'Save plan'}
+            </Button>
+          </Card>
+        ) : null}
         {weeklyPlans.length ? (
           <View style={styles.templateGrid}>
             {weeklyPlans.map((plan) => {
@@ -376,42 +373,6 @@ function PlannerContent() {
             <Text style={styles.cardCopy}>Generate a weekly plan to save it to your account.</Text>
           </Card>
         )}
-      </View>
-
-      <View style={styles.templates}>
-        <SectionTitle title="Saved templates" />
-        {activePlan ? (
-          <Card tone="low" style={styles.templateSaveCard}>
-            <Field
-              label="Template name"
-              value={templateName}
-              onChangeText={setTemplateName}
-              placeholder="Work week, cutting plan, high protein"
-              style={styles.templateNameField}
-            />
-            <Button icon={Save} onPress={handleSaveTemplate} disabled={savingTemplate}>
-              {savingTemplate ? 'Saving...' : 'Save template'}
-            </Button>
-          </Card>
-        ) : null}
-        <View style={styles.templateGrid}>
-          {templates.map((template) => (
-            <Card key={template.id} style={styles.templateCard}>
-              <Text style={styles.cardTitle}>{template.title}</Text>
-              <Text style={styles.cardCopy}>{formatCalories(template.averageCalories)} average</Text>
-              <Button variant="secondary" onPress={() => loadTemplate(template.id)}>
-                Load template
-              </Button>
-              <Button
-                variant="danger"
-                icon={Trash2}
-                onPress={() => handleDeleteTemplate(template.id)}
-                disabled={deletingTemplateId === template.id}>
-                {deletingTemplateId === template.id ? 'Deleting...' : 'Delete template'}
-              </Button>
-            </Card>
-          ))}
-        </View>
       </View>
     </AppShell>
   );

@@ -62,14 +62,6 @@ export type WeeklyPlan = {
   createdAt?: unknown;
 };
 
-export type PlanTemplate = {
-  id: string;
-  title: string;
-  averageCalories: number;
-  days: PlanDay[];
-  createdAt?: unknown;
-};
-
 export type ShoppingItem = {
   id: string;
   label: string;

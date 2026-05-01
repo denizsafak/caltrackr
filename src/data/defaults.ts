@@ -1,4 +1,4 @@
-import { MealType, PlanDay, PlanTemplate, Recipe, ShoppingList, UserProfile, WeeklyPlan } from '@/types/domain';
+import { MealType, PlanDay, Recipe, ShoppingList, UserProfile, WeeklyPlan } from '@/types/domain';
 
 export const todayISO = () => new Date().toISOString().slice(0, 10);
 
@@ -75,21 +75,6 @@ export const buildPlanFromRecipes = (
     title: 'Generated weekly meal plan',
     weekStart: start,
     days,
-  };
-};
-
-export const buildTemplateFromPlan = (plan: WeeklyPlan, title?: string): PlanTemplate => {
-  const averageCalories = Math.round(
-    plan.days.reduce((sum, day) => sum + day.meals.reduce((mealSum, meal) => mealSum + meal.calories, 0), 0) /
-      plan.days.length,
-  );
-  const cleanTitle = title?.trim();
-
-  return {
-    id: `template-${Date.now()}`,
-    title: cleanTitle || `${plan.title} template`,
-    averageCalories,
-    days: plan.days,
   };
 };
 
