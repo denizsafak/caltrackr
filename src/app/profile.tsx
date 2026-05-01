@@ -19,7 +19,7 @@ export default function ProfileScreen() {
 
 function ProfileContent() {
   const { signOut } = useAuth();
-  const { profile, templates, totals, loading, updateProfile } = useAppData();
+  const { profile, weeklyPlans, templates, totals, loading, updateProfile } = useAppData();
   const [dailyGoal, setDailyGoal] = useState('');
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
@@ -142,12 +142,18 @@ function ProfileContent() {
       <View style={styles.templates}>
         <SectionTitle title="Saved plans" />
         <View style={styles.templateGrid}>
-          {templates.map((template) => (
-            <Card key={template.id} style={styles.templateCard}>
-              <Text style={styles.templateTitle}>{template.title}</Text>
-              <Text style={styles.cardCopy}>{template.averageCalories.toLocaleString()} kcal average</Text>
-            </Card>
-          ))}
+          {weeklyPlans.map((plan) => {
+            const average = Math.round(
+              plan.days.reduce((sum, day) => sum + day.meals.reduce((inner, meal) => inner + meal.calories, 0), 0) /
+                plan.days.length,
+            );
+            return (
+              <Card key={plan.id} style={styles.templateCard}>
+                <Text style={styles.templateTitle}>{plan.title}</Text>
+                <Text style={styles.cardCopy}>{average.toLocaleString()} kcal average</Text>
+              </Card>
+            );
+          })}
         </View>
       </View>
     </AppShell>

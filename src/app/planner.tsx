@@ -45,6 +45,7 @@ function PlannerContent() {
     deleteTemplate,
     generateShoppingList,
     logPlanDay,
+    loadPlan,
   } = useAppData();
   const [loggingDay, setLoggingDay] = useState<string | null>(null);
   const [picker, setPicker] = useState<PickerState | null>(null);
@@ -355,6 +356,9 @@ function PlannerContent() {
                   <Text style={styles.cardLabel}>{plan.id === activePlan?.id ? 'Active plan' : plan.weekStart}</Text>
                   <Text style={styles.cardTitle}>{plan.title}</Text>
                   <Text style={styles.cardCopy}>{formatCalories(average)} daily average</Text>
+                  <Button variant="secondary" onPress={() => loadPlan(plan.id)}>
+                    Load plan
+                  </Button>
                   <Button
                     variant="danger"
                     icon={Trash2}

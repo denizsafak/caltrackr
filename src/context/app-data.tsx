@@ -62,6 +62,7 @@ type AppDataContextValue = {
   saveTemplate: (title?: string) => Promise<void>;
   loadTemplate: (templateId: string) => Promise<void>;
   deleteTemplate: (templateId: string) => Promise<void>;
+  loadPlan: (planId: string) => Promise<void>;
   buildClientPlanDraft: (clientId: string, mode: 'current' | 'auto' | 'empty') => Promise<WeeklyPlan>;
   savePlanForClient: (clientId: string, plan: WeeklyPlan) => Promise<void>;
   generateShoppingList: () => Promise<void>;
@@ -637,15 +638,39 @@ export function AppDataProvider({ children }: PropsWithChildren) {
       const uid = requireUser();
       const template = templates.find((item) => item.id === templateId);
       if (!template) return;
+      const start = todayISO();
       const plan: WeeklyPlan = {
-        id: `week-${todayISO()}`,
+        id: `week-${start}`,
         title: template.title,
-        weekStart: todayISO(),
-        days: template.days,
+        weekStart: start,
+        days: template.days.map((day, index) => ({
+          ...day,
+          date: addDaysISO(start, index),
+        })),
       };
       await setDoc(doc(db, 'users', uid, 'weeklyPlans', plan.id), { ...plan, createdAt: serverTimestamp() }, { merge: true });
     },
     [requireUser, templates],
+  );
+
+  const loadPlan = useCallback(
+    async (planId: string) => {
+      const uid = requireUser();
+      const sourcePlan = weeklyPlans.find((item) => item.id === planId);
+      if (!sourcePlan) return;
+      const start = todayISO();
+      const plan: WeeklyPlan = {
+        id: `week-${start}`,
+        title: sourcePlan.title,
+        weekStart: start,
+        days: sourcePlan.days.map((day, index) => ({
+          ...day,
+          date: addDaysISO(start, index),
+        })),
+      };
+      await setDoc(doc(db, 'users', uid, 'weeklyPlans', plan.id), { ...plan, createdAt: serverTimestamp() }, { merge: true });
+    },
+    [requireUser, weeklyPlans],
   );
 
   const deleteTemplate = useCallback(
@@ -906,6 +931,7 @@ export function AppDataProvider({ children }: PropsWithChildren) {
       saveTemplate,
       loadTemplate,
       deleteTemplate,
+      loadPlan,
       buildClientPlanDraft,
       savePlanForClient,
       generateShoppingList,
@@ -932,6 +958,7 @@ export function AppDataProvider({ children }: PropsWithChildren) {
       generatePlan,
       generateShoppingList,
       loadTemplate,
+      loadPlan,
       loading,
       logPlanDay,
       logMeal,
