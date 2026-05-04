@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Protected } from '@/components/protected';
-import { AppShell, Card, Chip, LoadingState, PageHeader, SectionTitle, Button } from '@/components/ui';
+import { AppShell, Card, Chip, LoadingState, PageHeader, SectionTitle } from '@/components/ui';
 import { colors, fonts, radii, spacing } from '@/constants/theme';
 import { useAppData } from '@/context/app-data';
 import { useAuth } from '@/context/auth';

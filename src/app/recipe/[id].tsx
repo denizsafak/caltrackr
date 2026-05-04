@@ -23,7 +23,7 @@ export default function RecipeDetailScreen() {
 
 function RecipeDetailContent() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { recipes, cookAndLog, loading } = useAppData();
+  const { recipes, loading } = useAppData();
   const localRecipe = recipes.find((item) => item.id === id);
   const [externalRecipe, setExternalRecipe] = useState<Recipe | null>(null);
   const [externalLoading, setExternalLoading] = useState(false);

@@ -4,6 +4,7 @@ import { Redirect } from 'expo-router';
 
 import { Protected } from '@/components/protected';
 import { useAuth } from '@/context/auth';
+import { View } from 'react-native';
 
 // Mock the authentication context
 jest.mock('@/context/auth', () => ({
@@ -16,9 +17,12 @@ jest.mock('expo-router', () => ({
 }));
 
 // Mock UI components
-jest.mock('@/components/ui', () => ({
-  LoadingState: () => <test-file-stub testID="loading-state" />,
-}));
+jest.mock('@/components/ui', () => {
+  const { View } = require('react-native');
+  return {
+    LoadingState: () => <View testID="loading-state" />,
+  };
+});
 
 describe('Protected Component', () => {
   beforeEach(() => {
@@ -30,7 +34,7 @@ describe('Protected Component', () => {
 
     const { getByTestId } = render(
       <Protected>
-        <test-file-stub testID="child-component" />
+        <View testID="child-component" />
       </Protected>
     );
 
@@ -42,7 +46,7 @@ describe('Protected Component', () => {
 
     render(
       <Protected>
-        <test-file-stub testID="child-component" />
+        <View testID="child-component" />
       </Protected>
     );
 
@@ -55,7 +59,7 @@ describe('Protected Component', () => {
 
     const { getByTestId } = render(
       <Protected>
-        <test-file-stub testID="child-component" />
+        <View testID="child-component" />
       </Protected>
     );
 

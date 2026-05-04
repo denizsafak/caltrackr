@@ -122,6 +122,13 @@ function PlannerContent() {
   };
 
   const handleLogDay = async (dayDate: string) => {
+    setLoggingDay(dayDate);
+    
+    // Log the day using background app-data
+    if (logPlanDay) {
+      await logPlanDay(dayDate).catch(console.error);
+    }
+    
     router.push({
       pathname: '/tracker',
       params: {
@@ -129,6 +136,11 @@ function PlannerContent() {
         date: dayDate,
       },
     });
+
+    // Reset after animation
+    setTimeout(() => {
+      setLoggingDay(null);
+    }, 1000);
   };
 
   const handleGenerateShoppingList = async () => {

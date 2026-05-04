@@ -71,7 +71,6 @@ type AppDataContextValue = {
 };
 
 const AppDataContext = createContext<AppDataContextValue | undefined>(undefined);
-const planDayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const planMealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner'];
 const localCatalogRecipes = (recipeCatalog as { recipes: Recipe[] }).recipes.map((recipe) => ({
   ...recipe,

@@ -61,7 +61,7 @@ export default function RecipesScreen() {
 }
 
 function RecipesContent() {
-  const { profile, recipes, cookAndLog, loading } = useAppData();
+  const { profile, recipes, loading } = useAppData();
   const [ingredientInput, setIngredientInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [ingredients, setIngredients] = useState<string[]>(profile?.pantry ?? []);
