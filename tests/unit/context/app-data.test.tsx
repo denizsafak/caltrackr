@@ -67,7 +67,7 @@ describe('normalizePlanMeal', () => {
   it('normalizes correctly with recipe', () => {
     const meal = { id: 'm1', title: 'Meal', mealType: 'Lunch' as any, calories: 500, recipeId: 'r1' };
     const recipes = [
-      { id: 'r1', title: 'R', mealType: 'Lunch' as any, calories: 600, macros: { protein: 10, carbs: 20, fats: 30 }, ingredients: ['A'], source: 'local', allergens: [], prepMinutes: 10, tags: [], summary: '', imageUrl: '' }
+      { id: 'r1', title: 'R', mealType: 'Lunch' as any, calories: 600, macros: { protein: 10, carbs: 20, fats: 30 }, ingredients: ['A'], instructions: [], source: 'local' as const, allergens: [], prepMinutes: 10, tags: [], summary: '', imageUrl: '' }
     ];
     const result = normalizePlanMeal('2023-01-01', meal, 'p1', recipes);
     expect(result.title).toBe('Meal');
@@ -90,10 +90,10 @@ const DummyComponent = () => {
   useEffect(() => {
     // Fire all methods to test coverage
     const fireAll = async () => {
-      try { await data.logMeal({ title: 'T', mealType: 'Lunch', calories: '1', protein: '1', carbs: '1', fats: '1', ingredients: 'a' }); } catch {}
-      try { await data.updateMeal('1', { title: 'T', mealType: 'Lunch', calories: '1', protein: '1', carbs: '1', fats: '1', ingredients: 'a' }); } catch {}
+      try { await data.logMeal({ title: 'T', mealType: 'Lunch', calories: 1, protein: 1, carbs: 1, fats: 1, ingredients: 'a' }); } catch {}
+      try { await data.updateMeal('1', { title: 'T', mealType: 'Lunch', calories: 1, protein: 1, carbs: 1, fats: 1, ingredients: 'a' }); } catch {}
       try { await data.deleteMeal('1'); } catch {}
-      try { await data.cookAndLog({ id: 'r1', title: 'R', mealType: 'Lunch', calories: 600, macros: { protein: 10, carbs: 20, fats: 30 }, ingredients: ['A'], source: 'local', allergens: [], prepMinutes: 10, tags: [], summary: '', imageUrl: '' }); } catch {}
+      try { await data.cookAndLog({ id: 'r1', title: 'R', mealType: 'Lunch', calories: 600, macros: { protein: 10, carbs: 20, fats: 30 }, ingredients: ['A'], instructions: [], source: 'local', allergens: [], prepMinutes: 10, tags: [], summary: '', imageUrl: '' }); } catch {}
       try { await data.generatePlan(); } catch {}
       try { await data.deletePlan('1'); } catch {}
       try { await data.savePlan(); } catch {}

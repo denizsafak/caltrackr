@@ -2,9 +2,9 @@ import { todayISO, addDaysISO, defaultProfile, buildPlanFromRecipes, buildShoppi
 import { Recipe } from '@/types/domain';
 
 const mockRecipes: Recipe[] = [
-  { id: '1', title: 'Eggs', mealType: 'Breakfast', calories: 300, ingredients: ['Eggs'], instructions: [], prepTimeMin: 5 },
-  { id: '2', title: 'Salad', mealType: 'Lunch', calories: 400, ingredients: ['Lettuce'], instructions: [], prepTimeMin: 10 },
-  { id: '3', title: 'Steak', mealType: 'Dinner', calories: 600, ingredients: ['Steak'], instructions: [], prepTimeMin: 20 },
+  { id: '1', title: 'Eggs', mealType: 'Breakfast', calories: 300, ingredients: ['Eggs'], instructions: [], prepMinutes: 5, macros: { protein: 0, carbs: 0, fats: 0 }, source: 'local', allergens: [], tags: [], summary: '', imageUrl: '' },
+  { id: '2', title: 'Salad', mealType: 'Lunch', calories: 400, ingredients: ['Lettuce'], instructions: [], prepMinutes: 10, macros: { protein: 0, carbs: 0, fats: 0 }, source: 'local', allergens: [], tags: [], summary: '', imageUrl: '' },
+  { id: '3', title: 'Steak', mealType: 'Dinner', calories: 600, ingredients: ['Steak'], instructions: [], prepMinutes: 20, macros: { protein: 0, carbs: 0, fats: 0 }, source: 'local', allergens: [], tags: [], summary: '', imageUrl: '' },
 ];
 
 describe('Data Defaults', () => {
