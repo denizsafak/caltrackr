@@ -1,53 +1,91 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
 export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
-};
+  primary: '#126c4a',
+  primaryDim: '#006040',
+  onPrimary: '#e6ffee',
+  primaryContainer: '#a1f4c8',
+  onPrimaryContainer: '#005e3e',
+  secondary: '#006d48',
+  secondaryContainer: '#92f7c3',
+  onSecondaryContainer: '#005e3e',
+  tertiary: '#a73b19',
+  tertiaryContainer: '#fa7750',
+  background: '#f8f9fa',
+  surface: '#f8f9fa',
+  surfaceLow: '#f1f4f5',
+  surfaceLowest: '#ffffff',
+  surfaceHigh: '#e5e9eb',
+  surfaceHighest: '#dee3e6',
+  surfaceContainer: '#ebeef0',
+  onSurface: '#2d3335',
+  onSurfaceVariant: '#5a6062',
+  outline: '#767c7e',
+  outlineVariant: '#adb3b5',
+  error: '#a83836',
+  errorContainer: '#fa746f',
+  success: '#92f7c3',
+  warning: '#fa7750',
+} as const;
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+export const Typography = {
+  displayLg: { fontSize: 48, letterSpacing: -0.96, fontFamily: 'Inter_700Bold' },
+  displayMd: { fontSize: 40, letterSpacing: -0.8, fontFamily: 'Inter_700Bold' },
+  headlineLg: { fontSize: 28, letterSpacing: -0.28, fontFamily: 'Inter_700Bold' },
+  headlineMd: { fontSize: 24, letterSpacing: -0.24, fontFamily: 'Inter_600SemiBold' },
+  headlineSm: { fontSize: 20, letterSpacing: -0.2, fontFamily: 'Inter_600SemiBold' },
+  titleLg: { fontSize: 18, letterSpacing: -0.18, fontFamily: 'Inter_600SemiBold' },
+  titleMd: { fontSize: 16, letterSpacing: -0.16, fontFamily: 'Inter_500Medium' },
+  titleSm: { fontSize: 14, letterSpacing: -0.14, fontFamily: 'Inter_500Medium' },
+  bodyLg: { fontSize: 16, lineHeight: 24, fontFamily: 'Inter_400Regular' },
+  bodyMd: { fontSize: 14, lineHeight: 22, fontFamily: 'Inter_400Regular' },
+  bodySm: { fontSize: 12, lineHeight: 18, fontFamily: 'Inter_400Regular' },
+  labelLg: { fontSize: 14, fontFamily: 'Inter_500Medium' },
+  labelMd: { fontSize: 12, fontFamily: 'Inter_500Medium' },
+  labelSm: { fontSize: 11, fontFamily: 'Inter_400Regular' },
+} as const;
+
+export const Spacing = {
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 48,
+  xxxl: 64,
+} as const;
+
+export const Radius = {
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  full: 9999,
+} as const;
+
+export const Shadow = {
+  card: Platform.select({
+    web: {
+      boxShadow: '0px 4px 12px rgba(45, 51, 53, 0.06)',
+    },
+    default: {
+      shadowColor: '#2d3335',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.06,
+      shadowRadius: 12,
+      elevation: 3,
+    },
+  }),
+  modal: Platform.select({
+    web: {
+      boxShadow: '0px 20px 40px rgba(45, 51, 53, 0.08)',
+    },
+    default: {
+      shadowColor: '#2d3335',
+      shadowOffset: { width: 0, height: 20 },
+      shadowOpacity: 0.08,
+      shadowRadius: 40,
+      elevation: 8,
+    },
+  }),
+} as const;

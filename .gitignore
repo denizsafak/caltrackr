@@ -41,3 +41,6 @@ app-example
 # generated native folders
 /ios
 /android
+
+# keys
+firebase/caltrackr-bbc14-firebase-adminsdk-fbsvc-5cf9008092.json
