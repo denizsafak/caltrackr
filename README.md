@@ -1,3 +1,4 @@
+<div align="center">
 # 🥗 CalTrackr
 
 **Smart meal planning and calorie tracking — powered by ingredient-aware recipe suggestions.**
@@ -78,6 +79,18 @@ Here's a typical usage flow that shows how the three features connect:
 > Sarah opens CalTrackr on Sunday evening and generates a 1,800-calorie-per-day plan for the week. By Tuesday she has leftover spinach and chicken in the fridge. Rather than sticking rigidly to the plan, she switches to the Smart Recipe Engine, enters her two ingredients, and finds a healthy spinach-chicken salad. She logs it directly in the app — her progress bar updates instantly, confirming she's still on track for her weight-loss goal.
 
 This scenario reflects the app's design philosophy: **structure when you need it, flexibility when you don't.**
+
+---
+
+## Development & Testing Commands
+
+CalTrackr uses standard NPM scripts to handle all core CLI tasks for linting, testing, and building.
+- **Run the app:** `npm run start`
+- **Lint the codebase:** `npm run lint` or `npm run lint:fix`
+- **Typecheck TypeScript:** `npm run typecheck`
+- **Run the Jest test suite:** `npm run test`
+- **Generate full Code Coverage:** `npm run test:coverage` (This will check if the app meets the globally configured 70% threshold minimum coverage limits and generate a visual HTML report inside `coverage/lcov-report/index.html`)
+- **Docker Compose (Local):** `npm run docker:dev`
 
 ---
 

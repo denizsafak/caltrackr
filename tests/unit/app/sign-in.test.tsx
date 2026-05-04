@@ -74,4 +74,72 @@ describe('SignInScreen', () => {
       expect(Alert.alert).toHaveBeenCalledWith('Sign in failed', 'Invalid credentials');
     });
   });
+
+  it('handles successful google sign in', async () => {
+    mockSignInWithGoogle.mockResolvedValueOnce({});
+    
+    const { getByText } = render(<SignInScreen />);
+    
+    fireEvent.press(getByText('Continue with Google'));
+    
+    await waitFor(() => {
+      expect(mockSignInWithGoogle).toHaveBeenCalled();
+      expect(router.replace).toHaveBeenCalledWith('/dashboard');
+    });
+  });
+
+  it('displays an error on google sign in failure', async () => {
+    mockSignInWithGoogle.mockRejectedValueOnce(new Error('Google error'));
+    
+    const { getByText } = render(<SignInScreen />);
+    
+    fireEvent.press(getByText('Continue with Google'));
+    
+    await waitFor(() => {
+      expect(mockSignInWithGoogle).toHaveBeenCalled();
+      expect(getByText('Google error')).toBeTruthy();
+      expect(Alert.alert).toHaveBeenCalledWith('Google sign in failed', 'Google error');
+    });
+  });
+
+  it('displays error if forgot password submitted without email', async () => {
+    const { getByText } = render(<SignInScreen />);
+    
+    fireEvent.press(getByText('Forgot password?'));
+    
+    await waitFor(() => {
+      expect(getByText('Please enter your email address to reset password.')).toBeTruthy();
+    });
+  });
+
+  it('handles successful forgot password', async () => {
+    mockResetPassword.mockResolvedValueOnce({});
+    
+    const { getByText, UNSAFE_getAllByType } = render(<SignInScreen />);
+    const emailInput = UNSAFE_getAllByType(require('react-native').TextInput)[0];
+    fireEvent.changeText(emailInput, 'test@example.com');
+    
+    fireEvent.press(getByText('Forgot password?'));
+    
+    await waitFor(() => {
+      expect(mockResetPassword).toHaveBeenCalledWith('test@example.com');
+      expect(Alert.alert).toHaveBeenCalledWith('Password reset email sent', 'Check your inbox for further instructions.');
+    });
+  });
+
+  it('displays error on forgot password failure', async () => {
+    mockResetPassword.mockRejectedValueOnce(new Error('Reset failed'));
+    
+    const { getByText, UNSAFE_getAllByType } = render(<SignInScreen />);
+    const emailInput = UNSAFE_getAllByType(require('react-native').TextInput)[0];
+    fireEvent.changeText(emailInput, 'test@example.com');
+    
+    fireEvent.press(getByText('Forgot password?'));
+    
+    await waitFor(() => {
+      expect(mockResetPassword).toHaveBeenCalledWith('test@example.com');
+      expect(getByText('Reset failed')).toBeTruthy();
+      expect(Alert.alert).toHaveBeenCalledWith('Reset failed', 'Reset failed');
+    });
+  });
 });

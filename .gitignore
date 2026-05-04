@@ -17,3 +17,7 @@ _expo/
 
 # firebase env
 /firebase
+
+# coverage
+coverage/
+
