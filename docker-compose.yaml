@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      # If you want to test the production build locally, you can use the production image:
+      # dockerfile: Dockerfile
+    image: caltrackr-dev:latest
+    ports:
+      - "8081:8081"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.expo
+    # Command to run for local development
+    command: npm run web
+    environment:
+      - NODE_ENV=development
+      - EXPO_NO_TELEMETRY=1
+      # Add other environment variables here

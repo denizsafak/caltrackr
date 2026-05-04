@@ -92,7 +92,7 @@ export default function SignInScreen() {
             Continue with Google
           </Button>
           <View style={styles.divider} />
-          <Text style={styles.switchTextCenter}>Don't have an account?</Text>
+          <Text style={styles.switchTextCenter}>Don&apos;t have an account?</Text>
           <Link href="/sign-up" asChild>
             <Button variant="secondary" disabled={busy}>
               Sign Up
