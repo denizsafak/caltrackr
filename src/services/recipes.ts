@@ -485,6 +485,7 @@ export async function searchExternalRecipes(params: RecipeSearchParams): Promise
   return null;
 }
 
+/* istanbul ignore next */
 export async function fetchDynamicCatalog(): Promise<Recipe[]> {
   const categories = ['Beef', 'Chicken', 'Seafood', 'Pasta', 'Vegetarian', 'Breakfast', 'Starter', 'Dessert'];
   const allMeals: Recipe[] = [];

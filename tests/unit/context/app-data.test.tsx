@@ -61,6 +61,7 @@ jest.mock('firebase/firestore', () => ({
 jest.mock('@/services/recipes', () => ({
   getExternalRecipeById: jest.fn(() => ({ id: 'r1', ingredients: ['A'] })),
   searchExternalRecipes: jest.fn(() => ({ recipes: [{ id: 'r1', ingredients: ['A'] }] })),
+  fetchDynamicCatalog: jest.fn(() => Promise.resolve([])),
 }));
 
 describe('normalizePlanMeal', () => {
