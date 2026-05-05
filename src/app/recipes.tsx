@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import { RecipeImage } from '@/components/RecipeImage';
 import { Link, router } from 'expo-router';
 import { ArrowRight, Plus, Search, Sparkles } from 'lucide-react-native';
 import { useEffect, useMemo, useState } from 'react';
@@ -279,7 +280,7 @@ function RecipesContent() {
         <View style={styles.recipeGrid}>
           {visibleRecipes.map(({ recipe, matchedTerms, missingTerms }) => (
             <Card key={recipe.id} style={styles.recipeCard}>
-              <Image source={{ uri: recipe.imageUrl }} style={styles.recipeImage} contentFit="cover" />
+              <RecipeImage title={recipe.title} fallbackUrl={recipe.imageUrl} style={styles.recipeImage} contentFit="cover" />
               <View style={styles.recipeBody}>
                 <View style={styles.recipeTop}>
                   <View style={styles.recipeTitleBlock}>

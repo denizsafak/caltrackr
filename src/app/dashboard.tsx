@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import { RecipeImage } from '@/components/RecipeImage';
 import { Link, router } from 'expo-router';
 import { CalendarDays, ChefHat, Plus, ShoppingBasket, TriangleAlert } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
@@ -92,7 +93,7 @@ function DashboardContent() {
             const recipe = recipes.find((item) => item.id === meal.recipeId);
             return (
               <Card key={meal.id} style={styles.mealCard}>
-                {recipe ? <Image source={{ uri: recipe.imageUrl }} style={styles.mealImage} contentFit="cover" /> : null}
+                {recipe ? <RecipeImage title={recipe.title} fallbackUrl={recipe.imageUrl} style={styles.mealImage} contentFit="cover" /> : null}
                 <View style={styles.mealBody}>
                   <Text style={styles.mealType}>{meal.mealType}</Text>
                   <Text style={styles.mealTitle}>{meal.title}</Text>

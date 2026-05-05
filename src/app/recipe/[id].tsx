@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import { RecipeImage } from '@/components/RecipeImage';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Bookmark, ExternalLink, Share2, Utensils } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
@@ -96,7 +97,7 @@ function RecipeDetailContent() {
       </View>
 
       <View style={styles.hero}>
-        <Image source={{ uri: recipe.imageUrl }} style={styles.heroImage} contentFit="cover" />
+        <RecipeImage title={recipe.title} fallbackUrl={recipe.imageUrl} style={styles.heroImage} contentFit="cover" />
         <View style={styles.heroOverlay}>
           <Text style={styles.tag}>{recipe.mealType}</Text>
           <Text style={styles.heroTitle}>{recipe.title}</Text>

@@ -26,10 +26,9 @@ import {
   defaultProfile,
   todayISO,
 } from '@/data/defaults';
-import recipeCatalog from '../../data/recipe-catalog.json';
 import { useAuth } from '@/context/auth';
 import { db } from '@/lib/firebase';
-import { getExternalRecipeById, searchExternalRecipes } from '@/services/recipes';
+import { getExternalRecipeById, searchExternalRecipes, fetchDynamicCatalog } from '@/services/recipes';
 import { MealDraft, MealLog, MealType, PlanMeal, Recipe, ShoppingList, UserProfile, UserRole, WeeklyPlan } from '@/types/domain';
 
 type AppDataContextValue = {
@@ -73,10 +72,7 @@ type AppDataContextValue = {
 
 const AppDataContext = createContext<AppDataContextValue | undefined>(undefined);
 const planMealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner'];
-const localCatalogRecipes = (recipeCatalog as { recipes: Recipe[] }).recipes.map((recipe) => ({
-  ...recipe,
-  source: recipe.source ?? 'local',
-})) satisfies Recipe[];
+
 
 const splitIngredients = (value: string) =>
   value
@@ -290,7 +286,9 @@ async function resolveRecipesForShoppingList(plan: WeeklyPlan, recipes: Recipe[]
 export function AppDataProvider({ children }: PropsWithChildren) {
   const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [recipes, setRecipes] = useState<Recipe[]>(localCatalogRecipes);
+  const [firestoreRecipes, setFirestoreRecipes] = useState<Recipe[]>([]);
+  const [dynamicCatalog, setDynamicCatalog] = useState<Recipe[]>([]);
+  const recipes = useMemo(() => uniqueRecipes([...firestoreRecipes, ...dynamicCatalog]), [firestoreRecipes, dynamicCatalog]);
   const [assignedClients, setAssignedClients] = useState<UserProfile[]>([]);
   const [mealLogs, setMealLogs] = useState<MealLog[]>([]);
   const [weeklyPlans, setWeeklyPlans] = useState<WeeklyPlan[]>([]);
@@ -333,6 +331,8 @@ export function AppDataProvider({ children }: PropsWithChildren) {
     ensureUserBootstrap()
       .catch(console.error)
       .finally(() => setLoading(false));
+      
+    fetchDynamicCatalog().then(setDynamicCatalog).catch(console.error);
 
     const handleSnapshotError = (label: string) => (error: Error) => {
       console.error(`Firestore ${label} listener failed`, error);
@@ -351,7 +351,7 @@ export function AppDataProvider({ children }: PropsWithChildren) {
         query(collection(db, 'recipes'), orderBy('title')),
         (snapshot) => {
           const nextRecipes = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }) as Recipe);
-          setRecipes(uniqueRecipes([...nextRecipes, ...localCatalogRecipes]));
+          setFirestoreRecipes(nextRecipes);
         },
         handleSnapshotError('recipes'),
       ),

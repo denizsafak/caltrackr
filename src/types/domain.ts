@@ -17,7 +17,7 @@ export type Recipe = {
   prepMinutes: number;
   ingredients: string[];
   allergens: string[];
-  imageUrl: string;
+  imageUrl?: string;
   instructions: string[];
   tags: string[];
   source?: 'local' | 'spoonacular' | 'themealdb';
