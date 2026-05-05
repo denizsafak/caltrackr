@@ -1,5 +1,5 @@
 import { Link, router } from 'expo-router';
-import { UserRound, Utensils } from 'lucide-react-native';
+import { Flame, UserRound } from 'lucide-react-native';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -72,7 +72,7 @@ export default function SignInScreen() {
         <View style={styles.wrap}>
         <View style={styles.hero}>
           <View style={styles.brandMark}>
-            <Utensils size={28} color={colors.primary} />
+            <Flame size={28} color={colors.primary} />
           </View>
           <Text style={styles.brand}>CalTrackr</Text>
           <Text style={styles.title}>Smart nutrition planning, made calm.</Text>
