@@ -38,7 +38,7 @@ jest.mock('lucide-react-native', () => ({
   Settings: () => 'SettingsIcon',
   ShieldCheck: () => 'ShieldCheckIcon',
   ShoppingBasket: () => 'ShoppingBasketIcon',
-  Utensils: () => 'UtensilsIcon',
+  Flame: () => 'FlameIcon',
   User: () => 'UserIcon',
   Users: () => 'UsersIcon',
 }));

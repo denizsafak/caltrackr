@@ -21,7 +21,7 @@ jest.mock('@/context/auth', () => ({
 // Mock Lucide icons
 jest.mock('lucide-react-native', () => ({
   UserRound: () => 'UserRoundIcon',
-  Utensils: () => 'UtensilsIcon',
+  Flame: () => 'FlameIcon',
 }));
 
 describe('SignInScreen', () => {

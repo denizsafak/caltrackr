@@ -4,13 +4,13 @@ import {
   Bell,
   CalendarDays,
   ChefHat,
+  Flame,
   Home,
   LucideIcon,
   Plus,
   Settings,
   ShieldCheck,
   ShoppingBasket,
-  Utensils,
   User,
   Users,
 } from 'lucide-react-native';
@@ -206,7 +206,7 @@ export function AppShell({ children, scroll = true }: PropsWithChildren<{ scroll
       <View style={styles.topBar}>
         <View style={styles.brand}>
           <View style={styles.brandIcon}>
-            <Utensils size={20} color={colors.primary} />
+            <Flame size={20} color={colors.primary} />
           </View>
           <Text style={styles.brandText}>CalTrackr</Text>
         </View>
