@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
-import { render, waitFor, act } from '@testing-library/react-native';
+import React, { useEffect, useRef } from 'react';
+import { render, waitFor } from '@testing-library/react-native';
 import { AppDataProvider, normalizePlanMeal, useAppData } from '@/context/app-data';
 import * as AuthContext from '@/context/auth';
-import * as Firebase from '@/lib/firebase';
 import * as Firestore from 'firebase/firestore';
+import * as RecipesService from '@/services/recipes';
 import { Text } from 'react-native';
 
 // Mock dependencies
@@ -15,10 +15,33 @@ jest.mock('@/lib/firebase', () => ({
   db: {},
 }));
 
+const mockRecipe = {
+  id: 'r1',
+  title: 'Meal',
+  mealType: 'Lunch',
+  calories: 100,
+  macros: { protein: 10, carbs: 20, fats: 5 },
+  ingredients: ['A'],
+  instructions: [],
+  source: 'local',
+  allergens: [],
+  prepMinutes: 10,
+  tags: [],
+  summary: '',
+  imageUrl: '',
+};
+
 const mockPlan = {
-  id: '1', title: 'Plan', weekStart: '2023-01-01', days: [
-    { date: '2023-01-01', meals: [{ id: 'm1', mealType: 'Lunch', title: 'Meal', recipeId: 'r1', calories: 100 }] }
-  ]
+  id: '1',
+  title: 'Plan',
+  weekStart: '2026-05-05',
+  days: [
+    {
+      date: '2026-05-05',
+      dayLabel: 'Tue',
+      meals: [{ id: 'm1', mealType: 'Lunch', title: 'Meal', recipeId: 'r1', calories: 100 }],
+    },
+  ],
 };
 
 const mockShoppingList = {
@@ -60,8 +83,70 @@ jest.mock('firebase/firestore', () => ({
 
 jest.mock('@/services/recipes', () => ({
   getExternalRecipeById: jest.fn(() => ({ id: 'r1', ingredients: ['A'] })),
-  searchExternalRecipes: jest.fn(() => ({ recipes: [{ id: 'r1', ingredients: ['A'] }] })),
+  searchExternalRecipes: jest.fn(() => ({ recipes: [] })),
 }));
+
+const docFor = <T extends { id: string }>(data: T) => ({ id: data.id, data: () => data });
+
+const mockDefaultSnapshots = () => {
+  (Firestore.onSnapshot as jest.Mock).mockImplementation((_ref, callback) => {
+    // Return dummy data based on the type of ref or just generic docs
+    callback({ exists: () => true, id: '1', data: () => ({ role: 'admin', clientIds: ['c1'] }), docs: [
+      docFor(mockPlan),
+      docFor(mockShoppingList),
+      docFor({ id: 'user1', role: 'dietitian', clientIds: ['c1'], weekStart: '' }),
+      docFor({ id: 'c1', role: 'user', dietitianId: 'user1', weekStart: '' }),
+    ] });
+    return jest.fn();
+  });
+};
+
+const mockAppDataSnapshots = ({
+  profile = { role: 'user' },
+  recipes = [mockRecipe],
+  weeklyPlans = [mockPlan],
+  mealLogs = [],
+  shoppingLists = [],
+} = {}) => {
+  const snapshots = [
+    { exists: () => true, id: 'user1', data: () => profile },
+    { docs: recipes.map(docFor) },
+    { docs: mealLogs.map(docFor) },
+    { docs: weeklyPlans.map(docFor) },
+    { docs: shoppingLists.map(docFor) },
+  ];
+
+  (Firestore.onSnapshot as jest.Mock).mockImplementation((_ref, callback) => {
+    callback(snapshots.shift() ?? { docs: [] });
+    return jest.fn();
+  });
+};
+
+const GeneratePlanOnReady = () => {
+  const data = useAppData();
+  const didRun = useRef(false);
+
+  useEffect(() => {
+    if (didRun.current || data.loading || !data.profile || !data.activePlan) return;
+    didRun.current = true;
+    data.generatePlan().catch(console.error);
+  }, [data]);
+
+  return <Text>Child</Text>;
+};
+
+const LoadPlanOnReady = ({ planId }: { planId: string }) => {
+  const data = useAppData();
+  const didRun = useRef(false);
+
+  useEffect(() => {
+    if (didRun.current || data.loading || !data.profile || !data.weeklyPlans.length) return;
+    didRun.current = true;
+    data.loadPlan(planId).catch(console.error);
+  }, [data, planId]);
+
+  return <Text>Child</Text>;
+};
 
 describe('normalizePlanMeal', () => {
   it('normalizes correctly with recipe', () => {
@@ -118,7 +203,10 @@ const DummyComponent = () => {
 
 describe('AppDataProvider', () => {
   beforeEach(() => {
+    jest.useRealTimers();
     jest.clearAllMocks();
+    mockDefaultSnapshots();
+    (RecipesService.searchExternalRecipes as jest.Mock).mockResolvedValue({ recipes: [] });
   });
 
   it('renders correctly for unauthenticated user', async () => {
@@ -149,5 +237,64 @@ describe('AppDataProvider', () => {
       expect(Firestore.getDoc).toHaveBeenCalled();
     });
   });
-});
 
+  it('regenerates the active plan from the current week Monday', async () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-05-06T10:00:00'));
+    const mockUser = { uid: 'user1', email: 'test@example.com', displayName: 'Test' };
+    (AuthContext.useAuth as jest.Mock).mockReturnValue({ user: mockUser });
+    (Firestore.getDoc as jest.Mock).mockResolvedValue({ exists: () => true, data: () => ({ role: 'user' }) });
+    mockAppDataSnapshots();
+
+    render(
+      <AppDataProvider>
+        <GeneratePlanOnReady />
+      </AppDataProvider>
+    );
+
+    await waitFor(() => {
+      const regeneratedPlan = (Firestore.setDoc as jest.Mock).mock.calls.find(([, payload]) => payload?.title === 'Regenerated smart week')?.[1];
+      expect(regeneratedPlan).toEqual(
+        expect.objectContaining({
+          id: mockPlan.id,
+          weekStart: '2026-05-04',
+        }),
+      );
+      expect(regeneratedPlan.days[0]).toEqual(
+        expect.objectContaining({
+          date: '2026-05-04',
+          dayLabel: 'Mon',
+        }),
+      );
+    });
+  });
+
+  it('reloads saved plans with day labels recalculated for the current week', async () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-05-06T10:00:00'));
+    const mockUser = { uid: 'user1', email: 'test@example.com', displayName: 'Test' };
+    (AuthContext.useAuth as jest.Mock).mockReturnValue({ user: mockUser });
+    (Firestore.getDoc as jest.Mock).mockResolvedValue({ exists: () => true, data: () => ({ role: 'user' }) });
+    mockAppDataSnapshots();
+
+    render(
+      <AppDataProvider>
+        <LoadPlanOnReady planId={mockPlan.id} />
+      </AppDataProvider>
+    );
+
+    await waitFor(() => {
+      const loadedPlan = (Firestore.setDoc as jest.Mock).mock.calls.find(([, payload]) => payload?.weekStart === '2026-05-04')?.[1];
+      expect(loadedPlan).toEqual(
+        expect.objectContaining({
+          id: 'week-2026-05-04',
+          weekStart: '2026-05-04',
+        }),
+      );
+      expect(loadedPlan.days[0]).toEqual(
+        expect.objectContaining({
+          date: '2026-05-04',
+          dayLabel: 'Mon',
+        }),
+      );
+    });
+  });
+});

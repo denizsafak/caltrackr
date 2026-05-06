@@ -44,6 +44,36 @@ const sourceLabel = (recipe: Recipe) => {
   return 'External';
 };
 
+const getCalorieImpact = (recipeCalories: number, remainingCalories: number) => {
+  if (remainingCalories <= 0) {
+    return {
+      color: colors.warning,
+      label: 'Daily goal reached',
+      value: 100,
+      warning: true,
+    };
+  }
+
+  const usagePercent = Math.min((recipeCalories / remainingCalories) * 100, 100);
+  const overage = recipeCalories - remainingCalories;
+
+  if (overage > 0) {
+    return {
+      color: colors.warning,
+      label: `Over by ${formatCalories(overage)}`,
+      value: usagePercent,
+      warning: true,
+    };
+  }
+
+  return {
+    color: colors.primary,
+    label: `Uses ${Math.round(usagePercent)}% of remaining`,
+    value: usagePercent,
+    warning: false,
+  };
+};
+
 const ingredientMatches = (recipeIngredient: string, searchTerm: string) => {
   const ingredient = singularize(normalizeIngredient(recipeIngredient));
   const term = singularize(normalizeIngredient(searchTerm));
@@ -61,7 +91,7 @@ export default function RecipesScreen() {
 }
 
 function RecipesContent() {
-  const { profile, recipes, loading } = useAppData();
+  const { profile, recipes, totals, loading } = useAppData();
   const [ingredientInput, setIngredientInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [ingredients, setIngredients] = useState<string[]>([]);
@@ -134,6 +164,8 @@ function RecipesContent() {
   }, [excluded, ingredients, matchMode, prep, searchQuery]);
 
   if (loading || !profile) return <LoadingState />;
+
+  const remainingCalories = profile.dailyGoal - totals.calories;
 
   const addIngredient = () => {
     const next = ingredientInput.trim();
@@ -273,59 +305,68 @@ function RecipesContent() {
             : ''}
         </Text>
         <View style={styles.recipeGrid}>
-          {visibleRecipes.map(({ recipe, matchedTerms, missingTerms }) => (
-            <Card key={recipe.id} style={styles.recipeCard}>
-              <Image source={{ uri: recipe.imageUrl }} style={styles.recipeImage} contentFit="cover" />
-              <View style={styles.recipeBody}>
-                <View style={styles.recipeTop}>
-                  <View style={styles.recipeTitleBlock}>
-                    <Text style={styles.recipeTag}>{recipe.tags[0]}</Text>
-                    <Text style={styles.recipeTitle}>{recipe.title}</Text>
+          {visibleRecipes.map(({ recipe, matchedTerms, missingTerms }) => {
+            const calorieImpact = getCalorieImpact(recipe.calories, remainingCalories);
+
+            return (
+              <Card key={recipe.id} style={styles.recipeCard}>
+                <Image source={{ uri: recipe.imageUrl }} style={styles.recipeImage} contentFit="cover" />
+                <View style={styles.recipeBody}>
+                  <View style={styles.recipeTop}>
+                    <View style={styles.recipeTitleBlock}>
+                      <Text style={styles.recipeTag}>{recipe.tags[0]}</Text>
+                      <Text style={styles.recipeTitle}>{recipe.title}</Text>
+                    </View>
+                    <Text style={styles.calories}>{formatCalories(recipe.calories)}</Text>
                   </View>
-                  <Text style={styles.calories}>{formatCalories(recipe.calories)}</Text>
-                </View>
-                {recipe.source && recipe.source !== 'local' ? <Text style={styles.liveBadge}>{sourceLabel(recipe)} result</Text> : null}
-                <Text style={styles.summary}>{recipe.summary}</Text>
-                {ingredients.length ? (
-                  <View style={styles.matchInfo}>
-                    <Text style={styles.matchInfoText}>
-                      Has {matchedTerms.length ? matchedTerms.join(', ') : 'no search items'}
+                  {recipe.source && recipe.source !== 'local' ? <Text style={styles.liveBadge}>{sourceLabel(recipe)} result</Text> : null}
+                  <Text style={styles.summary}>{recipe.summary}</Text>
+                  {ingredients.length ? (
+                    <View style={styles.matchInfo}>
+                      <Text style={styles.matchInfoText}>
+                        Has {matchedTerms.length ? matchedTerms.join(', ') : 'no search items'}
+                      </Text>
+                      {missingTerms.length ? <Text style={styles.missingText}>Needs {missingTerms.join(', ')}</Text> : null}
+                    </View>
+                  ) : null}
+                  <View style={styles.miniMacro}>
+                    <Text style={styles.macroText}>Protein {recipe.macros.protein}g</Text>
+                    <Text style={styles.macroText}>Carbs {recipe.macros.carbs}g</Text>
+                  </View>
+                  <View style={styles.calorieImpact}>
+                    <ProgressBar value={calorieImpact.value} color={calorieImpact.color} />
+                    <Text style={[styles.calorieImpactText, calorieImpact.warning && styles.calorieImpactWarning]}>
+                      {calorieImpact.label}
                     </Text>
-                    {missingTerms.length ? <Text style={styles.missingText}>Needs {missingTerms.join(', ')}</Text> : null}
                   </View>
-                ) : null}
-                <View style={styles.miniMacro}>
-                  <Text style={styles.macroText}>Protein {recipe.macros.protein}g</Text>
-                  <Text style={styles.macroText}>Carbs {recipe.macros.carbs}g</Text>
+                  <View style={styles.recipeActions}>
+                    <Button onPress={() => {
+                      router.push({
+                        pathname: '/tracker',
+                        params: {
+                          action: 'cookAndLog',
+                          recipeId: recipe.id,
+                          title: recipe.title,
+                          calories: recipe.calories,
+                          protein: recipe.macros.protein,
+                          carbs: recipe.macros.carbs,
+                          fats: recipe.macros.fats,
+                          ingredients: recipe.ingredients.join(', '),
+                          mealType: recipe.mealType || 'Lunch',
+                        }
+                      });
+                    }}>Cook and log</Button>
+                    <Link href={`/recipe/${recipe.id}` as never} asChild>
+                      <Pressable style={styles.detailLink}>
+                        <Text style={styles.detailText}>Details</Text>
+                        <ArrowRight size={16} color={colors.primary} />
+                      </Pressable>
+                    </Link>
+                  </View>
                 </View>
-                <ProgressBar value={Math.min((recipe.macros.protein / 50) * 100, 100)} />
-                <View style={styles.recipeActions}>
-                  <Button onPress={() => {
-                    router.push({
-                      pathname: '/tracker',
-                      params: {
-                        action: 'cookAndLog',
-                        recipeId: recipe.id,
-                        title: recipe.title,
-                        calories: recipe.calories,
-                        protein: recipe.macros.protein,
-                        carbs: recipe.macros.carbs,
-                        fats: recipe.macros.fats,
-                        ingredients: recipe.ingredients.join(', '),
-                        mealType: recipe.mealType || 'Lunch',
-                      }
-                    });
-                  }}>Cook and log</Button>
-                  <Link href={`/recipe/${recipe.id}` as never} asChild>
-                    <Pressable style={styles.detailLink}>
-                      <Text style={styles.detailText}>Details</Text>
-                      <ArrowRight size={16} color={colors.primary} />
-                    </Pressable>
-                  </Link>
-                </View>
-              </View>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </View>
         {!results.length ? (
           <Card tone="low">
@@ -515,6 +556,17 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
     fontSize: 11,
     textTransform: 'uppercase',
+  },
+  calorieImpact: {
+    gap: spacing.xs,
+  },
+  calorieImpactText: {
+    color: colors.muted,
+    fontFamily: fonts.bold,
+    fontSize: 12,
+  },
+  calorieImpactWarning: {
+    color: colors.warning,
   },
   recipeActions: {
     flexDirection: 'row',

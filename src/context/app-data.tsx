@@ -156,6 +156,11 @@ function sortPlans(plans: WeeklyPlan[]) {
   return [...plans].sort((a, b) => b.weekStart.localeCompare(a.weekStart));
 }
 
+const dayLabelForDate = (date: string) => {
+  const dateObj = new Date(`${date}T12:00:00`);
+  return new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(dateObj);
+};
+
 function normalizeUserProfile(id: string, data: Partial<UserProfile>): UserProfile {
   return {
     ...defaultProfile(id, data.email ?? 'caltrackr@example.com', data.name ?? 'New user'),
@@ -531,11 +536,12 @@ export function AppDataProvider({ children }: PropsWithChildren) {
   /* istanbul ignore next */
   const generatePlan = useCallback(async () => {
     const uid = requireUser();
+    const currentWeekStart = getCurrentMondayISO();
     const planRecipes = await recipesForPlanGeneration(profile, recipes);
     const plan = buildPlanFromRecipes(
       planRecipes,
-      activePlan?.id ?? `week-${getCurrentMondayISO()}`,
-      activePlan?.weekStart ?? getCurrentMondayISO(),
+      activePlan?.id ?? `week-${currentWeekStart}`,
+      currentWeekStart,
       mealTypesForProfile(profile),
       activePlan,
     );
@@ -644,10 +650,14 @@ export function AppDataProvider({ children }: PropsWithChildren) {
         id: `week-${start}`,
         title: sourcePlan.title,
         weekStart: start,
-        days: sourcePlan.days.map((day, index) => ({
-          ...day,
-          date: addDaysISO(start, index),
-        })),
+        days: sourcePlan.days.map((day, index) => {
+          const date = addDaysISO(start, index);
+          return {
+            ...day,
+            date,
+            dayLabel: dayLabelForDate(date),
+          };
+        }),
       };
       await setDoc(doc(db, 'users', uid, 'weeklyPlans', plan.id), { ...plan, createdAt: serverTimestamp() }, { merge: true });
     },
