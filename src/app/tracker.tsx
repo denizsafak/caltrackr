@@ -7,7 +7,7 @@ import { Protected } from '@/components/protected';
 import { AppShell, Button, Card, Chip, Field, LoadingState, MacroBars, PageHeader, ProgressBar, SectionTitle } from '@/components/ui';
 import { colors, fonts, formatCalories, radii, spacing } from '@/constants/theme';
 import { useAppData, normalizePlanMeal } from '@/context/app-data';
-import { todayISO } from '@/data/defaults';
+import { addDaysISO, todayISO } from '@/data/defaults';
 import { estimateNutrition, estimateToMealDraft } from '@/services/nutrition';
 import { MealDraft, MealLog, MealType } from '@/types/domain';
 
@@ -345,16 +345,18 @@ function TrackerContent() {
             .filter(group => viewMode === 'list' || group.date === selectedDate)
             .map((group) => {
             const isToday = group.date === todayISO();
+            const isYesterday = group.date === addDaysISO(todayISO(), -1);
+            const isEditable = isToday || isYesterday;
             return (
               <View key={group.date} style={styles.dayGroup}>
                 <View style={styles.dayHeader}>
-                  <Text style={styles.dayDate}>{isToday ? 'Today' : group.date}</Text>
+                  <Text style={styles.dayDate}>{isToday ? 'Today' : isYesterday ? 'Yesterday' : group.date}</Text>
                   <Text style={styles.dayTotals}>
                     {formatCalories(group.totals.calories)} - P {group.totals.protein}g / C {group.totals.carbs}g / F {group.totals.fats}g
                   </Text>
                 </View>
                 {group.logs.map((meal) => (
-                  <Pressable key={meal.id} onPress={isToday ? () => edit(meal) : undefined} style={[styles.logItem, !isToday && { opacity: 0.7 }]}>
+                  <Pressable key={meal.id} onPress={isEditable ? () => edit(meal) : undefined} style={[styles.logItem, !isEditable && { opacity: 0.7 }]}>
                     <View style={styles.logCopy}>
                       <Text style={styles.logMealType}>{meal.mealType}</Text>
                       <Text style={styles.logTitle}>{meal.title}</Text>
@@ -362,7 +364,7 @@ function TrackerContent() {
                         {formatCalories(meal.calories)} - P {meal.macros.protein}g / C {meal.macros.carbs}g / F {meal.macros.fats}g
                       </Text>
                     </View>
-                    {isToday && (
+                    {isEditable && (
                       <Pressable onPress={() => deleteMeal(meal.id)} style={styles.deleteButton}>
                         <Trash2 size={18} color={colors.danger} />
                       </Pressable>

@@ -93,7 +93,6 @@ export type UserProfile = {
     intermittentFasting: boolean;
   };
   allergens: string[];
-  pantry: string[];
   dietitianId?: string | null;
   clientIds?: string[];
   createdAt?: unknown;

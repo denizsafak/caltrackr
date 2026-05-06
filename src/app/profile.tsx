@@ -25,6 +25,8 @@ function ProfileContent() {
   const [carbs, setCarbs] = useState('');
   const [fats, setFats] = useState('');
   const [allergens, setAllergens] = useState('');
+  const [weight, setWeight] = useState('');
+  const [targetWeight, setTargetWeight] = useState('');
 
   useEffect(() => {
     if (!profile) return;
@@ -33,6 +35,8 @@ function ProfileContent() {
     setCarbs(String(profile.macroTargets.carbs));
     setFats(String(profile.macroTargets.fats));
     setAllergens(profile.allergens.join(', '));
+    setWeight(String(profile.weightKg));
+    setTargetWeight(String(profile.targetWeightKg));
   }, [profile]);
 
   if (loading || !profile) return <LoadingState />;
@@ -40,6 +44,8 @@ function ProfileContent() {
   const saveGoals = async () => {
     await updateProfile({
       dailyGoal: Number(dailyGoal) || profile.dailyGoal,
+      weightKg: Number(weight) || profile.weightKg,
+      targetWeightKg: Number(targetWeight) || profile.targetWeightKg,
       macroTargets: {
         protein: Number(protein) || profile.macroTargets.protein,
         carbs: Number(carbs) || profile.macroTargets.carbs,
@@ -117,6 +123,8 @@ function ProfileContent() {
           <SectionTitle title="Goals" />
           <View style={styles.twoCol}>
             <Field label="Daily kcal" value={dailyGoal} onChangeText={setDailyGoal} keyboardType="numeric" />
+            <Field label="Weight (kg)" value={weight} onChangeText={setWeight} keyboardType="numeric" />
+            <Field label="Target weight (kg)" value={targetWeight} onChangeText={setTargetWeight} keyboardType="numeric" />
             <Field label="Protein target" value={protein} onChangeText={setProtein} keyboardType="numeric" />
             <Field label="Carbs target" value={carbs} onChangeText={setCarbs} keyboardType="numeric" />
             <Field label="Fats target" value={fats} onChangeText={setFats} keyboardType="numeric" />

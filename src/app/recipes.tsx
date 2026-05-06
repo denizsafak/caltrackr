@@ -13,10 +13,10 @@ import { Recipe } from '@/types/domain';
 
 const prepFilters = ['Any time', 'Under 15m', '15-30m', '30m+'] as const;
 type PrepFilter = (typeof prepFilters)[number];
-const matchModes = ['Best pantry fit', 'Must include all'] as const;
+const matchModes = ['Best ingredient fit', 'Must include all'] as const;
 type MatchMode = (typeof matchModes)[number];
 const pageSize = 72;
-const pantryStaples = new Set(['lemon', 'olive oil', 'herbs', 'salt', 'pepper', 'water', 'spices', 'garlic', 'onion']);
+const recipeStaples = new Set(['lemon', 'olive oil', 'herbs', 'salt', 'pepper', 'water', 'spices', 'garlic', 'onion']);
 
 type RecipeMatch = {
   recipe: Recipe;
@@ -34,7 +34,7 @@ const normalizeIngredient = (value: string) =>
 
 const singularize = (value: string) => value.replace(/ies$/, 'y').replace(/s$/, '');
 
-const isStaple = (value: string) => pantryStaples.has(normalizeIngredient(value));
+const isStaple = (value: string) => recipeStaples.has(normalizeIngredient(value));
 
 const isExternalRecipe = (recipe: Recipe) => Boolean(recipe.source && recipe.source !== 'local');
 
@@ -44,9 +44,39 @@ const sourceLabel = (recipe: Recipe) => {
   return 'External';
 };
 
-const ingredientMatches = (recipeIngredient: string, pantryTerm: string) => {
+const getCalorieImpact = (recipeCalories: number, remainingCalories: number) => {
+  if (remainingCalories <= 0) {
+    return {
+      color: colors.warning,
+      label: 'Daily goal reached',
+      value: 100,
+      warning: true,
+    };
+  }
+
+  const usagePercent = Math.min((recipeCalories / remainingCalories) * 100, 100);
+  const overage = recipeCalories - remainingCalories;
+
+  if (overage > 0) {
+    return {
+      color: colors.warning,
+      label: `Over by ${formatCalories(overage)}`,
+      value: usagePercent,
+      warning: true,
+    };
+  }
+
+  return {
+    color: colors.primary,
+    label: `Uses ${Math.round(usagePercent)}% of remaining`,
+    value: usagePercent,
+    warning: false,
+  };
+};
+
+const ingredientMatches = (recipeIngredient: string, searchTerm: string) => {
   const ingredient = singularize(normalizeIngredient(recipeIngredient));
-  const term = singularize(normalizeIngredient(pantryTerm));
+  const term = singularize(normalizeIngredient(searchTerm));
 
   if (!ingredient || !term) return false;
   return ingredient.includes(term) || term.includes(ingredient);
@@ -61,12 +91,12 @@ export default function RecipesScreen() {
 }
 
 function RecipesContent() {
-  const { profile, recipes, loading } = useAppData();
+  const { profile, recipes, totals, loading } = useAppData();
   const [ingredientInput, setIngredientInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [ingredients, setIngredients] = useState<string[]>(profile?.pantry ?? []);
+  const [ingredients, setIngredients] = useState<string[]>([]);
   const [prep, setPrep] = useState<PrepFilter>('Any time');
-  const [matchMode, setMatchMode] = useState<MatchMode>('Best pantry fit');
+  const [matchMode, setMatchMode] = useState<MatchMode>('Best ingredient fit');
   const [excluded, setExcluded] = useState(profile?.allergens.join(', ') ?? '');
   const [visibleCount, setVisibleCount] = useState(pageSize);
   const [liveRecipes, setLiveRecipes] = useState<Recipe[]>([]);
@@ -75,7 +105,6 @@ function RecipesContent() {
 
   useEffect(() => {
     if (!profile) return;
-    setIngredients((current) => (current.length ? current : profile.pantry));
     setExcluded((current) => current || profile.allergens.join(', '));
   }, [profile]);
 
@@ -136,6 +165,8 @@ function RecipesContent() {
 
   if (loading || !profile) return <LoadingState />;
 
+  const remainingCalories = profile.dailyGoal - totals.calories;
+
   const addIngredient = () => {
     const next = ingredientInput.trim();
     if (!next) return;
@@ -176,12 +207,12 @@ function RecipesContent() {
       <PageHeader
         eyebrow="Smart recipe engine"
         title="Recipe Finder"
-        subtitle="Rank recipes by what is already in your pantry, then log the selected dish directly into today's journal."
+        subtitle="Rank recipes by what ingredients you have, then log the selected dish directly into today's journal."
       />
 
       <View style={styles.searchGrid}>
         <Card tone="low" style={styles.inputCard}>
-          <Text style={styles.label}>Pantry ingredients</Text>
+          <Text style={styles.label}>Search ingredients</Text>
           <View style={styles.chipRow}>
             {ingredients.map((ingredient) => (
               <Chip
@@ -240,9 +271,6 @@ function RecipesContent() {
             <Button variant="secondary" onPress={() => setIngredients([])}>
               Browse all
             </Button>
-            <Button variant="ghost" onPress={() => setIngredients(profile.pantry)}>
-              Use my pantry
-            </Button>
             {liveRecipes.length ? (
               <Button
                 variant="ghost"
@@ -273,68 +301,77 @@ function RecipesContent() {
         <Text style={styles.resultCopy}>
           Showing {visibleRecipes.length.toLocaleString()} of {results.length.toLocaleString()} recipes for the current filters.
           {liveRecipes.length
-            ? ` ${apiResultCount.toLocaleString()} ${liveSource} results are pinned first; local results follow pantry match rules.`
+            ? ` ${apiResultCount.toLocaleString()} ${liveSource} results are pinned first; local results follow ingredient match rules.`
             : ''}
         </Text>
         <View style={styles.recipeGrid}>
-          {visibleRecipes.map(({ recipe, matchedTerms, missingTerms }) => (
-            <Card key={recipe.id} style={styles.recipeCard}>
-              <Image source={{ uri: recipe.imageUrl }} style={styles.recipeImage} contentFit="cover" />
-              <View style={styles.recipeBody}>
-                <View style={styles.recipeTop}>
-                  <View style={styles.recipeTitleBlock}>
-                    <Text style={styles.recipeTag}>{recipe.tags[0]}</Text>
-                    <Text style={styles.recipeTitle}>{recipe.title}</Text>
+          {visibleRecipes.map(({ recipe, matchedTerms, missingTerms }) => {
+            const calorieImpact = getCalorieImpact(recipe.calories, remainingCalories);
+
+            return (
+              <Card key={recipe.id} style={styles.recipeCard}>
+                <Image source={{ uri: recipe.imageUrl }} style={styles.recipeImage} contentFit="cover" />
+                <View style={styles.recipeBody}>
+                  <View style={styles.recipeTop}>
+                    <View style={styles.recipeTitleBlock}>
+                      <Text style={styles.recipeTag}>{recipe.tags[0]}</Text>
+                      <Text style={styles.recipeTitle}>{recipe.title}</Text>
+                    </View>
+                    <Text style={styles.calories}>{formatCalories(recipe.calories)}</Text>
                   </View>
-                  <Text style={styles.calories}>{formatCalories(recipe.calories)}</Text>
-                </View>
-                {recipe.source && recipe.source !== 'local' ? <Text style={styles.liveBadge}>{sourceLabel(recipe)} result</Text> : null}
-                <Text style={styles.summary}>{recipe.summary}</Text>
-                {ingredients.length ? (
-                  <View style={styles.matchInfo}>
-                    <Text style={styles.matchInfoText}>
-                      Has {matchedTerms.length ? matchedTerms.join(', ') : 'no pantry items'}
+                  {recipe.source && recipe.source !== 'local' ? <Text style={styles.liveBadge}>{sourceLabel(recipe)} result</Text> : null}
+                  <Text style={styles.summary}>{recipe.summary}</Text>
+                  {ingredients.length ? (
+                    <View style={styles.matchInfo}>
+                      <Text style={styles.matchInfoText}>
+                        Has {matchedTerms.length ? matchedTerms.join(', ') : 'no search items'}
+                      </Text>
+                      {missingTerms.length ? <Text style={styles.missingText}>Needs {missingTerms.join(', ')}</Text> : null}
+                    </View>
+                  ) : null}
+                  <View style={styles.miniMacro}>
+                    <Text style={styles.macroText}>Protein {recipe.macros.protein}g</Text>
+                    <Text style={styles.macroText}>Carbs {recipe.macros.carbs}g</Text>
+                  </View>
+                  <View style={styles.calorieImpact}>
+                    <ProgressBar value={calorieImpact.value} color={calorieImpact.color} />
+                    <Text style={[styles.calorieImpactText, calorieImpact.warning && styles.calorieImpactWarning]}>
+                      {calorieImpact.label}
                     </Text>
-                    {missingTerms.length ? <Text style={styles.missingText}>Needs {missingTerms.join(', ')}</Text> : null}
                   </View>
-                ) : null}
-                <View style={styles.miniMacro}>
-                  <Text style={styles.macroText}>Protein {recipe.macros.protein}g</Text>
-                  <Text style={styles.macroText}>Carbs {recipe.macros.carbs}g</Text>
+                  <View style={styles.recipeActions}>
+                    <Button onPress={() => {
+                      router.push({
+                        pathname: '/tracker',
+                        params: {
+                          action: 'cookAndLog',
+                          recipeId: recipe.id,
+                          title: recipe.title,
+                          calories: recipe.calories,
+                          protein: recipe.macros.protein,
+                          carbs: recipe.macros.carbs,
+                          fats: recipe.macros.fats,
+                          ingredients: recipe.ingredients.join(', '),
+                          mealType: recipe.mealType || 'Lunch',
+                        }
+                      });
+                    }}>Cook and log</Button>
+                    <Link href={`/recipe/${recipe.id}` as never} asChild>
+                      <Pressable style={styles.detailLink}>
+                        <Text style={styles.detailText}>Details</Text>
+                        <ArrowRight size={16} color={colors.primary} />
+                      </Pressable>
+                    </Link>
+                  </View>
                 </View>
-                <ProgressBar value={Math.min((recipe.macros.protein / 50) * 100, 100)} />
-                <View style={styles.recipeActions}>
-                  <Button onPress={() => {
-                    router.push({
-                      pathname: '/tracker',
-                      params: {
-                        action: 'cookAndLog',
-                        recipeId: recipe.id,
-                        title: recipe.title,
-                        calories: recipe.calories,
-                        protein: recipe.macros.protein,
-                        carbs: recipe.macros.carbs,
-                        fats: recipe.macros.fats,
-                        ingredients: recipe.ingredients.join(', '),
-                        mealType: recipe.mealType || 'Lunch',
-                      }
-                    });
-                  }}>Cook and log</Button>
-                  <Link href={`/recipe/${recipe.id}` as never} asChild>
-                    <Pressable style={styles.detailLink}>
-                      <Text style={styles.detailText}>Details</Text>
-                      <ArrowRight size={16} color={colors.primary} />
-                    </Pressable>
-                  </Link>
-                </View>
-              </View>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </View>
         {!results.length ? (
           <Card tone="low">
             <Text style={styles.emptyTitle}>No recipes match those ingredients yet.</Text>
-            <Text style={styles.resultCopy}>Try Best pantry fit, remove one pantry chip, or browse all recipes.</Text>
+            <Text style={styles.resultCopy}>Try Best ingredient fit, remove one search chip, or browse all recipes.</Text>
           </Card>
         ) : null}
         {visibleCount < results.length ? (
@@ -519,6 +556,17 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
     fontSize: 11,
     textTransform: 'uppercase',
+  },
+  calorieImpact: {
+    gap: spacing.xs,
+  },
+  calorieImpactText: {
+    color: colors.muted,
+    fontFamily: fonts.bold,
+    fontSize: 12,
+  },
+  calorieImpactWarning: {
+    color: colors.warning,
   },
   recipeActions: {
     flexDirection: 'row',

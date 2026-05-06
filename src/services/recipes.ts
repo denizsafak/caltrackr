@@ -199,7 +199,7 @@ const mapSpoonacularResult = (result: SpoonacularResult): Recipe => {
     title: result.title,
     summary:
       cleanText(result.summary) ||
-      `Live Spoonacular recipe using ${ingredients.slice(0, 3).join(', ') || 'your selected pantry ingredients'}.`,
+      `Live Spoonacular recipe using ${ingredients.slice(0, 3).join(', ') || 'your selected ingredients'}.`,
     mealType: mealTypeFromDish(result.dishTypes),
     calories,
     macros: {
@@ -269,7 +269,7 @@ async function searchByIngredients(apiKey: string, ingredients: string[], number
         ...recipe,
         tags: ['Live API', `${match.usedIngredientCount ?? used.length} used`, ...(recipe.tags ?? []).slice(1, 2)],
         summary:
-          `${recipe.summary} Pantry match: ${used.join(', ') || 'selected ingredients'}.` +
+          `${recipe.summary} Ingredient match: ${used.join(', ') || 'selected ingredients'}.` +
           (missed.length ? ` May also need: ${missed.join(', ')}.` : ''),
       } satisfies Recipe;
     })

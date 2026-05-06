@@ -24,6 +24,7 @@ import {
   buildPlanFromRecipes,
   buildShoppingList,
   defaultProfile,
+  getCurrentMondayISO,
   todayISO,
 } from '@/data/defaults';
 import recipeCatalog from '../../data/recipe-catalog.json';
@@ -155,6 +156,11 @@ function sortPlans(plans: WeeklyPlan[]) {
   return [...plans].sort((a, b) => b.weekStart.localeCompare(a.weekStart));
 }
 
+const dayLabelForDate = (date: string) => {
+  const dateObj = new Date(`${date}T12:00:00`);
+  return new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(dateObj);
+};
+
 function normalizeUserProfile(id: string, data: Partial<UserProfile>): UserProfile {
   return {
     ...defaultProfile(id, data.email ?? 'caltrackr@example.com', data.name ?? 'New user'),
@@ -200,7 +206,7 @@ async function searchRecipesForPlan(profile: UserProfile | null) {
   ].filter(Boolean);
 
   const result = await searchExternalRecipes({
-    ingredients: profile?.pantry ?? [],
+    ingredients: [],
     query: preferenceTerms.join(' ') || 'healthy meal',
     number: 24,
   });
@@ -230,7 +236,7 @@ async function recipesForMealSwap(meal: PlanMeal, profile: UserProfile | null, r
   if (matchingLocalRecipes.length) return matchingLocalRecipes;
 
   const result = await searchExternalRecipes({
-    ingredients: profile?.pantry ?? [],
+    ingredients: [],
     query: `${meal.mealType} ${profile?.preferences?.vegan ? 'vegan' : 'high protein'}`,
     number: 12,
   });
@@ -240,7 +246,7 @@ async function recipesForMealSwap(meal: PlanMeal, profile: UserProfile | null, r
   const fallbackApiRecipes = filterRecipesForProfile(await searchRecipesForPlan(profile), profile).filter(notCurrentRecipe);
   if (fallbackApiRecipes.length) return fallbackApiRecipes;
 
-  throw new Error('No alternative recipe was found for this meal. Try adding recipes or changing your pantry/preferences.');
+  throw new Error('No alternative recipe was found for this meal. Try adding recipes or changing your preferences.');
 }
 
 async function resolveRecipeForPlanMeal(meal: PlanMeal, recipes: Recipe[]): Promise<Recipe | null> {
@@ -530,11 +536,12 @@ export function AppDataProvider({ children }: PropsWithChildren) {
   /* istanbul ignore next */
   const generatePlan = useCallback(async () => {
     const uid = requireUser();
+    const currentWeekStart = getCurrentMondayISO();
     const planRecipes = await recipesForPlanGeneration(profile, recipes);
     const plan = buildPlanFromRecipes(
       planRecipes,
-      activePlan?.id ?? `week-${todayISO()}`,
-      activePlan?.weekStart ?? todayISO(),
+      activePlan?.id ?? `week-${currentWeekStart}`,
+      currentWeekStart,
       mealTypesForProfile(profile),
       activePlan,
     );
@@ -638,15 +645,19 @@ export function AppDataProvider({ children }: PropsWithChildren) {
       const uid = requireUser();
       const sourcePlan = weeklyPlans.find((item) => item.id === planId);
       if (!sourcePlan) return;
-      const start = todayISO();
+      const start = getCurrentMondayISO();
       const plan: WeeklyPlan = {
         id: `week-${start}`,
         title: sourcePlan.title,
         weekStart: start,
-        days: sourcePlan.days.map((day, index) => ({
-          ...day,
-          date: addDaysISO(start, index),
-        })),
+        days: sourcePlan.days.map((day, index) => {
+          const date = addDaysISO(start, index);
+          return {
+            ...day,
+            date,
+            dayLabel: dayLabelForDate(date),
+          };
+        }),
       };
       await setDoc(doc(db, 'users', uid, 'weeklyPlans', plan.id), { ...plan, createdAt: serverTimestamp() }, { merge: true });
     },
@@ -675,7 +686,7 @@ export function AppDataProvider({ children }: PropsWithChildren) {
         }
       }
 
-      const start = todayISO();
+      const start = getCurrentMondayISO();
       const planId = `week-${start}`;
       const mealTypes = mealTypesForProfile(client);
 
@@ -687,21 +698,25 @@ export function AppDataProvider({ children }: PropsWithChildren) {
         };
       }
 
-      const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
       return {
         id: planId,
         title: `Dietitian plan for ${client.name}`,
         weekStart: start,
-        days: dayLabels.map((dayLabel, dayIndex) => ({
-          date: addDaysISO(start, dayIndex),
-          dayLabel,
-          meals: mealTypes.map((mealType) => ({
-            id: `${dayIndex}-${mealType.toLowerCase()}-empty`,
-            mealType,
-            title: 'No meal selected',
-            calories: 0,
-          })),
-        })),
+        days: Array.from({ length: 7 }).map((_, dayIndex) => {
+          const date = addDaysISO(start, dayIndex);
+          const dateObj = new Date(`${date}T12:00:00`);
+          const dayLabel = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(dateObj);
+          return {
+            date,
+            dayLabel,
+            meals: mealTypes.map((mealType) => ({
+              id: `${dayIndex}-${mealType.toLowerCase()}-empty`,
+              mealType,
+              title: 'No meal selected',
+              calories: 0,
+            })),
+          };
+        }),
       };
     },
     [assignedClients, profile?.role, recipes, requireUser],
