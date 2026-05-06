@@ -42,7 +42,6 @@ function PlannerContent() {
     choosePlanMeal,
     savePlan,
     generateShoppingList,
-    logPlanDay,
     loadPlan,
   } = useAppData();
   const [loggingDay, setLoggingDay] = useState<string | null>(null);
@@ -128,11 +127,7 @@ function PlannerContent() {
   const handleLogDay = async (dayDate: string) => {
     setLoggingDay(dayDate);
     
-    // Log the day using background app-data
-    if (logPlanDay) {
-      await logPlanDay(dayDate).catch(console.error);
-    }
-    
+    // Navigate to tracker for review — actual logging happens when user confirms each meal
     router.push({
       pathname: '/tracker',
       params: {
