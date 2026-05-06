@@ -13,10 +13,10 @@ import { Recipe } from '@/types/domain';
 
 const prepFilters = ['Any time', 'Under 15m', '15-30m', '30m+'] as const;
 type PrepFilter = (typeof prepFilters)[number];
-const matchModes = ['Best pantry fit', 'Must include all'] as const;
+const matchModes = ['Best ingredient fit', 'Must include all'] as const;
 type MatchMode = (typeof matchModes)[number];
 const pageSize = 72;
-const pantryStaples = new Set(['lemon', 'olive oil', 'herbs', 'salt', 'pepper', 'water', 'spices', 'garlic', 'onion']);
+const recipeStaples = new Set(['lemon', 'olive oil', 'herbs', 'salt', 'pepper', 'water', 'spices', 'garlic', 'onion']);
 
 type RecipeMatch = {
   recipe: Recipe;
@@ -34,7 +34,7 @@ const normalizeIngredient = (value: string) =>
 
 const singularize = (value: string) => value.replace(/ies$/, 'y').replace(/s$/, '');
 
-const isStaple = (value: string) => pantryStaples.has(normalizeIngredient(value));
+const isStaple = (value: string) => recipeStaples.has(normalizeIngredient(value));
 
 const isExternalRecipe = (recipe: Recipe) => Boolean(recipe.source && recipe.source !== 'local');
 
@@ -44,9 +44,9 @@ const sourceLabel = (recipe: Recipe) => {
   return 'External';
 };
 
-const ingredientMatches = (recipeIngredient: string, pantryTerm: string) => {
+const ingredientMatches = (recipeIngredient: string, searchTerm: string) => {
   const ingredient = singularize(normalizeIngredient(recipeIngredient));
-  const term = singularize(normalizeIngredient(pantryTerm));
+  const term = singularize(normalizeIngredient(searchTerm));
 
   if (!ingredient || !term) return false;
   return ingredient.includes(term) || term.includes(ingredient);
@@ -64,9 +64,9 @@ function RecipesContent() {
   const { profile, recipes, loading } = useAppData();
   const [ingredientInput, setIngredientInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [ingredients, setIngredients] = useState<string[]>(profile?.pantry ?? []);
+  const [ingredients, setIngredients] = useState<string[]>([]);
   const [prep, setPrep] = useState<PrepFilter>('Any time');
-  const [matchMode, setMatchMode] = useState<MatchMode>('Best pantry fit');
+  const [matchMode, setMatchMode] = useState<MatchMode>('Best ingredient fit');
   const [excluded, setExcluded] = useState(profile?.allergens.join(', ') ?? '');
   const [visibleCount, setVisibleCount] = useState(pageSize);
   const [liveRecipes, setLiveRecipes] = useState<Recipe[]>([]);
@@ -75,7 +75,6 @@ function RecipesContent() {
 
   useEffect(() => {
     if (!profile) return;
-    setIngredients((current) => (current.length ? current : profile.pantry));
     setExcluded((current) => current || profile.allergens.join(', '));
   }, [profile]);
 
@@ -176,12 +175,12 @@ function RecipesContent() {
       <PageHeader
         eyebrow="Smart recipe engine"
         title="Recipe Finder"
-        subtitle="Rank recipes by what is already in your pantry, then log the selected dish directly into today's journal."
+        subtitle="Rank recipes by what ingredients you have, then log the selected dish directly into today's journal."
       />
 
       <View style={styles.searchGrid}>
         <Card tone="low" style={styles.inputCard}>
-          <Text style={styles.label}>Pantry ingredients</Text>
+          <Text style={styles.label}>Search ingredients</Text>
           <View style={styles.chipRow}>
             {ingredients.map((ingredient) => (
               <Chip
@@ -240,9 +239,6 @@ function RecipesContent() {
             <Button variant="secondary" onPress={() => setIngredients([])}>
               Browse all
             </Button>
-            <Button variant="ghost" onPress={() => setIngredients(profile.pantry)}>
-              Use my pantry
-            </Button>
             {liveRecipes.length ? (
               <Button
                 variant="ghost"
@@ -273,7 +269,7 @@ function RecipesContent() {
         <Text style={styles.resultCopy}>
           Showing {visibleRecipes.length.toLocaleString()} of {results.length.toLocaleString()} recipes for the current filters.
           {liveRecipes.length
-            ? ` ${apiResultCount.toLocaleString()} ${liveSource} results are pinned first; local results follow pantry match rules.`
+            ? ` ${apiResultCount.toLocaleString()} ${liveSource} results are pinned first; local results follow ingredient match rules.`
             : ''}
         </Text>
         <View style={styles.recipeGrid}>
@@ -293,7 +289,7 @@ function RecipesContent() {
                 {ingredients.length ? (
                   <View style={styles.matchInfo}>
                     <Text style={styles.matchInfoText}>
-                      Has {matchedTerms.length ? matchedTerms.join(', ') : 'no pantry items'}
+                      Has {matchedTerms.length ? matchedTerms.join(', ') : 'no search items'}
                     </Text>
                     {missingTerms.length ? <Text style={styles.missingText}>Needs {missingTerms.join(', ')}</Text> : null}
                   </View>
@@ -334,7 +330,7 @@ function RecipesContent() {
         {!results.length ? (
           <Card tone="low">
             <Text style={styles.emptyTitle}>No recipes match those ingredients yet.</Text>
-            <Text style={styles.resultCopy}>Try Best pantry fit, remove one pantry chip, or browse all recipes.</Text>
+            <Text style={styles.resultCopy}>Try Best ingredient fit, remove one search chip, or browse all recipes.</Text>
           </Card>
         ) : null}
         {visibleCount < results.length ? (

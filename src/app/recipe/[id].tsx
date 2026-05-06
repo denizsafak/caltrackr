@@ -12,6 +12,23 @@ import { getExternalRecipeById } from '@/services/recipes';
 import { Recipe } from '@/types/domain';
 
 const isExternalRecipeId = (id?: string) => Boolean(id?.startsWith('themealdb-') || id?.startsWith('spoonacular-'));
+const measuredIngredientPattern = /^\s*(\d+(?:\.\d+)?)\s*g(?:rams?)?\s+(.+?)\s*$/i;
+
+const formatIngredient = (ingredient: string) => {
+  const measured = ingredient.match(measuredIngredientPattern);
+
+  if (!measured) {
+    return {
+      label: ingredient,
+      quantity: 'as listed',
+    };
+  }
+
+  return {
+    label: measured[2],
+    quantity: `${Math.round(Number(measured[1]))} g`,
+  };
+};
 
 export default function RecipeDetailScreen() {
   return (
@@ -114,12 +131,16 @@ function RecipeDetailContent() {
         <View style={styles.leftColumn}>
           <SectionTitle title="Ingredients" />
           <View style={styles.list}>
-            {recipe.ingredients.map((ingredient) => (
-              <View key={ingredient} style={styles.ingredient}>
-                <Text style={styles.ingredientText}>{ingredient}</Text>
-                <Text style={styles.ingredientQty}>1 portion</Text>
-              </View>
-            ))}
+            {recipe.ingredients.map((ingredient) => {
+              const item = formatIngredient(ingredient);
+
+              return (
+                <View key={ingredient} style={styles.ingredient}>
+                  <Text style={styles.ingredientText}>{item.label}</Text>
+                  <Text style={styles.ingredientQty}>{item.quantity}</Text>
+                </View>
+              );
+            })}
           </View>
 
           <SectionTitle title="Step by step" />

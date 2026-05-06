@@ -7,6 +7,7 @@ import { Protected } from '@/components/protected';
 import { AppShell, Button, Card, Chip, Field, LoadingState, Metric, PageHeader, SectionTitle, TotalLine } from '@/components/ui';
 import { colors, fonts, formatCalories, radii, spacing } from '@/constants/theme';
 import { useAppData } from '@/context/app-data';
+import { addDaysISO, todayISO } from '@/data/defaults';
 import { MealType, PlanDay, PlanMeal, Recipe } from '@/types/domain';
 
 const mealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
@@ -75,6 +76,9 @@ function PlannerContent() {
       })
       .slice(0, 18);
   }, [pickerMealType, recipeSearch, recipes]);
+
+  const todayStr = todayISO();
+  const yesterdayStr = addDaysISO(todayStr, -1);
 
   if (loading || !profile) return <LoadingState />;
 
@@ -280,6 +284,7 @@ function PlannerContent() {
           {activePlan.days.map((day) => {
             const total = day.meals.reduce((sum, meal) => sum + meal.calories, 0);
             const dayLogged = day.meals.every((meal) => loggedPlanMeals.has(`${day.date}:${meal.id}`));
+            const isLoggableDay = day.date === todayStr || day.date === yesterdayStr;
             return (
               <View key={day.date} style={styles.dayColumn}>
                 <View style={styles.dayHeader}>
@@ -320,7 +325,7 @@ function PlannerContent() {
                       icon={CheckCircle2}
                       variant={dayLogged ? 'secondary' : 'primary'}
                       onPress={() => handleLogDay(day.date)}
-                      disabled={loggingDay === day.date}
+                      disabled={loggingDay === day.date || !isLoggableDay}
                       style={styles.logDayButton}>
                       {loggingDay === day.date ? 'Logging...' : dayLogged ? 'Update log' : 'Log day'}
                     </Button>
